@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>АйтисДомен — Система управления доменами</title>
+
+  <!-- ─── Шрифты ─── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- ─── CSS: порядок важен! ─── -->
+  <!-- 1. Токены — CSS-переменные (все цвета, отступы, радиусы) -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <!-- 2. Сброс — нормализация стилей браузера -->
+  <link rel="stylesheet" href="css/base.css">
+  <!-- 3. Разметка — сетка, sidebar, topbar, main -->
+  <link rel="stylesheet" href="css/layout.css">
+  <!-- 4. Компоненты — кнопки, карточки, таблицы, формы -->
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     СТРУКТУРА ПРИЛОЖЕНИЯ
+     .app = grid(sidebar | topbar+main)
+     ════════════════════════════════════════════ -->
+<div class="app">
+
+  <!-- ─── БОКОВОЕ МЕНЮ ─── -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- Логотип -->
+    <div class="sidebar-logo">
+      <!-- SVG-логотип: буква A в виде домена -->
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="АйтисДомен">
+        <rect width="32" height="32" rx="8" fill="var(--color-primary)"/>
+        <path d="M9 23 L16 9 L23 23" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <line x1="11.5" y1="18" x2="20.5" y2="18" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="9" r="1.5" fill="white"/>
+      </svg>
+      <div>
+        <div class="logo-text">АйтисДомен</div>
+        <div class="logo-sub">Управление доменами</div>
+      </div>
+    </div>
+
+    <!-- Навигация -->
+    <nav class="sidebar-nav" role="navigation">
+      <span class="nav-section-label">Главное</span>
+
+      <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        Дашборд
+      </button>
+
+      <button class="nav-item" data-page="domains" onclick="showPage('domains')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        Реестр доменов
+      </button>
+
+      <button class="nav-item" data-page="requests" onclick="showPage('requests')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        Заявки
+        <span class="nav-badge" id="nav-req-badge">3</span>
+      </button>
+
+      <span class="nav-section-label">Данные</span>
+
+      <button class="nav-item" data-page="clients" onclick="showPage('clients')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Клиенты
+      </button>
+
+      <button class="nav-item" data-page="contracts" onclick="showPage('contracts')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4"/>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+        Договоры
+      </button>
+
+      <button class="nav-item" data-page="payments" onclick="showPage('payments')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+        Платежи
+      </button>
+
+      <span class="nav-section-label">Аналитика</span>
+
+      <button class="nav-item" data-page="reports" onclick="showPage('reports')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        Отчёты
+      </button>
+    </nav>
+
+    <!-- Текущий пользователь -->
+    <div class="sidebar-footer">
+      <div class="avatar">АК</div>
+      <div>
+        <div class="user-name">Андрей К.</div>
+        <div class="user-role">Администратор</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── ПРАВАЯ ЧАСТЬ: topbar + main ─── -->
+  <div style="display:flex;flex-direction:column;min-height:0">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <!-- Hamburger (мобильные) -->
+      <button class="icon-btn hamburger" onclick="openMobileMenu()" aria-label="Меню">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6"  x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      <!-- Заголовок текущей страницы -->
+      <h1 class="topbar-title" id="page-title">Дашборд</h1>
+
+      <!-- Глобальный поиск -->
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="search" placeholder="Поиск домена..." id="global-search"
+          onkeydown="if(event.key==='Enter')globalSearch(this.value)">
+      </div>
+
+      <div class="topbar-actions">
+        <!-- Уведомления -->
+        <button class="icon-btn" aria-label="Уведомления" title="Уведомления">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+        <!-- Переключатель темы -->
+        <button class="icon-btn" data-theme-toggle aria-label="Сменить тему"></button>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════
+         СТРАНИЦЫ (переключаются JS)
+         ═══════════════════════════════ -->
+    <main class="main" id="main-content">
+
+      <!-- ── ДАШБОРД ── -->
+      <section class="page active" id="page-dashboard">
+
+        <!-- KPI-сетка -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Всего доменов</span>
+              <div class="kpi-icon blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-total">—</div>
+            <div class="kpi-change">в реестре</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Истекают</span>
+              <div class="kpi-icon orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-expiring">—</div>
+            <div class="kpi-change">в течение 60 дней</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Просрочено</span>
+              <div class="kpi-icon red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-expired">—</div>
+            <div class="kpi-change down">требует действий</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Оплачено</span>
+              <div class="kpi-icon green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-revenue">—</div>
+            <div class="kpi-change up">за весь период</div>
+          </div>
+        </div>
+
+        <!-- Алерты -->
+        <div id="dash-alerts"></div>
+
+        <!-- Двухколоночный layout: таблица + лента -->
+        <div class="dash-cols">
+          <div class="section">
+            <div class="section-head">
+              <span class="section-title">Ближайшие продления</span>
+              <button class="btn btn-secondary btn-sm" onclick="showPage('domains')">Все домены</button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr>
+                  <th>Домен</th><th>Клиент</th><th>Истекает</th>
+                  <th>Осталось</th><th>Прогресс</th><th>Статус</th>
+                </tr></thead>
+                <tbody id="dash-renewals"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><span class="section-title">Лента событий</span></div>
+            <div id="dash-activity"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── РЕЕСТР ДОМЕНОВ ── -->
+      <section class="page" id="page-domains">
+        <div class="page-head">
+          <h2>Реестр доменов</h2>
+          <button class="btn btn-primary" onclick="openDomainModal(null)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Добавить домен
+          </button>
+        </div>
+        <div class="section">
+          <div class="filter-row">
+            <input  class="filter-input"  id="dom-search"     type="search" placeholder="Поиск по имени..." oninput="renderDomains()">
+            <select class="filter-select" id="dom-status"      onchange="renderDomains()">
+              <option value="">Все статусы</option>
+              <option value="active">Активные</option>
+              <option value="expiring">Истекают</option>
+              <option value="expired">Просрочены</option>
+            </select>
+            <select class="filter-select" id="dom-registrar"   onchange="renderDomains()">
+              <option value="">Все регистраторы</option>
+              <option>REG.RU</option><option>Selectel</option>
+              <option>RU-CENTER</option><option>Beget</option><option>TimeWeb</option>
+            </select>
+            <select class="filter-select" id="dom-client"      onchange="renderDomains()">
+              <option value="">Все клиенты</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>Домен</th><th>Клиент</th><th>Регистратор</th>
+                <th>Истекает</th><th>Осталось</th><th>Цена/год</th>
+                <th>Статус</th><th>Действия</th>
+              </tr></thead>
+              <tbody id="dom-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── ЗАЯВКИ ── -->
+      <section class="page" id="page-requests">
+        <div class="page-head">
+          <h2>Заявки</h2>
+          <button class="btn btn-primary" onclick="openRequestModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Новая заявка
+          </button>
+        </div>
+        <div class="section">
+          <div class="filter-row">
+            <select class="filter-select" id="req-status" onchange="renderRequests()">
+              <option value="">Все статусы</option>
+              <option value="new">Новые</option>
+              <option value="in_progress">В работе</option>
+              <option value="completed">Выполнены</option>
+            </select>
+            <select class="filter-select" id="req-type" onchange="renderRequests()">
+              <option value="">Все типы</option>
+              <option value="renewal">Продление</option>
+              <option value="registration">Регистрация</option>
+              <option value="change">Изм. DNS</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>#</th><th>Тип</th><th>Клиент</th><th>Домен</th>
+                <th>Дата</th><th>Статус</th><th>Исполнитель</th><th>Действия</th>
+              </tr></thead>
+              <tbody id="req-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── КЛИЕНТЫ ── -->
+      <section class="page" id="page-clients">
+        <div class="page-head">
+          <h2>Клиенты</h2>
+          <button class="btn btn-primary" onclick="openClientModal(null)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Добавить клиента
+          </button>
+        </div>
+        <div class="section">
+          <div class="filter-row">
+            <input class="filter-input" id="cli-search" type="search"
+              placeholder="Поиск по названию, контакту, ИНН..." oninput="renderClients()">
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>Организация</th><th>Контакт</th><th>Email</th>
+                <th>Телефон</th><th>ИНН</th><th>Доменов</th><th>Действия</th>
+              </tr></thead>
+              <tbody id="cli-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── ДОГОВОРЫ ── -->
+      <section class="page" id="page-contracts">
+        <div class="page-head"><h2>Договоры</h2></div>
+        <div class="section">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>#</th><th>Клиент</th><th>Дата заключения</th><th>Условия</th><th>Статус</th>
+              </tr></thead>
+              <tbody id="con-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── ПЛАТЕЖИ ── -->
+      <section class="page" id="page-payments">
+        <div class="page-head"><h2>Платежи</h2></div>
+        <div class="section">
+          <div class="pay-summary">
+            <div>
+              <div class="pay-sum-lbl">Поступило</div>
+              <div class="pay-sum-val" id="pay-confirmed">—</div>
+            </div>
+            <div>
+              <div class="pay-sum-lbl">Ожидается</div>
+              <div class="pay-sum-val" id="pay-pending" style="color:var(--color-warning)">—</div>
+            </div>
+          </div>
+          <div class="filter-row">
+            <select class="filter-select" id="pay-status" onchange="renderPayments()">
+              <option value="">Все статусы</option>
+              <option value="confirmed">Подтверждённые</option>
+              <option value="pending">Ожидают оплаты</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>Дата</th><th>Домен</th><th>Клиент</th>
+                <th>Сумма</th><th>Тип</th><th>Статус</th><th>Действия</th>
+              </tr></thead>
+              <tbody id="pay-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── ОТЧЁТЫ ── -->
+      <section class="page" id="page-reports">
+        <div class="page-head">
+          <h2>Отчёты</h2>
+          <button class="btn btn-secondary" onclick="exportCSV()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Экспорт CSV
+          </button>
+        </div>
+        <div class="report-cards">
+          <div class="report-card">
+            <div class="report-card-title">Всего доменов</div>
+            <div class="report-card-num" id="rep-total">—</div>
+          </div>
+          <div class="report-card">
+            <div class="report-card-title">Активных доменов</div>
+            <div class="report-card-num" id="rep-active" style="color:var(--color-success)">—</div>
+          </div>
+          <div class="report-card">
+            <div class="report-card-title">Истекают (&lt;60 дн.)</div>
+            <div class="report-card-num" id="rep-expiring" style="color:var(--color-warning)">—</div>
+          </div>
+          <div class="report-card">
+            <div class="report-card-title">Просрочено</div>
+            <div class="report-card-num" id="rep-expired" style="color:var(--color-error)">—</div>
+          </div>
+          <div class="report-card">
+            <div class="report-card-title">Клиентов</div>
+            <div class="report-card-num" id="rep-clients">—</div>
+          </div>
+          <div class="report-card">
+            <div class="report-card-title">Договоров</div>
+            <div class="report-card-num" id="rep-contracts">—</div>
+          </div>
+          <div class="report-card">
+            <div class="report-card-title">Выручка (подтв.)</div>
+            <div class="report-card-num" id="rep-revenue" style="color:var(--color-success)">—</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div><!-- /right column -->
+</div><!-- /.app -->
+
+<!-- ════════════════════════════════════════════
+     МОДАЛЬНЫЕ ОКНА
+     ════════════════════════════════════════════ -->
+
+<!-- Домен: добавить/редактировать -->
+<div class="modal-overlay" id="modal-domain" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dom-modal-title">
+    <div class="modal-header">
+      <h2 class="modal-title" id="dom-modal-title">Добавить домен</h2>
+      <button class="icon-btn" onclick="document.getElementById('modal-domain').classList.remove('open')" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="dom-modal-id">
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label" for="dom-modal-name">Имя домена *</label>
+          <input class="form-input" id="dom-modal-name" placeholder="example.ru" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dom-modal-client">Клиент *</label>
+          <select class="form-input" id="dom-modal-client"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dom-modal-reg">Регистратор</label>
+          <input class="form-input" id="dom-modal-reg" placeholder="REG.RU">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dom-modal-regdate">Дата регистрации</label>
+          <input class="form-input" type="date" id="dom-modal-regdate">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dom-modal-expdate">Дата истечения</label>
+          <input class="form-input" type="date" id="dom-modal-expdate">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dom-modal-price">Цена (₽/год)</label>
+          <input class="form-input" type="number" id="dom-modal-price" placeholder="1200">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dom-modal-status">Статус</label>
+          <select class="form-input" id="dom-modal-status">
+            <option value="active">Активный</option>
+            <option value="expiring">Истекает</option>
+            <option value="expired">Просрочен</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label" for="dom-modal-note">Заметка</label>
+          <input class="form-input" id="dom-modal-note" placeholder="Дополнительная информация...">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('modal-domain').classList.remove('open')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveDomain()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Клиент: добавить/редактировать -->
+<div class="modal-overlay" id="modal-client" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cli-modal-title">
+    <div class="modal-header">
+      <h2 class="modal-title" id="cli-modal-title">Добавить клиента</h2>
+      <button class="icon-btn" onclick="document.getElementById('modal-client').classList.remove('open')" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cli-modal-id">
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label" for="cli-modal-name">Организация *</label>
+          <input class="form-input" id="cli-modal-name" placeholder="ООО Пример" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cli-modal-contact">Контактное лицо</label>
+          <input class="form-input" id="cli-modal-contact" placeholder="Иванов И.И.">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cli-modal-inn">ИНН</label>
+          <input class="form-input" id="cli-modal-inn" placeholder="5902000000">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cli-modal-email">Email</label>
+          <input class="form-input" type="email" id="cli-modal-email" placeholder="info@company.ru">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cli-modal-phone">Телефон</label>
+          <input class="form-input" id="cli-modal-phone" placeholder="+7 342 000-00-00">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('modal-client').classList.remove('open')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveClient()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Заявка: создать -->
+<div class="modal-overlay" id="modal-request" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h2 class="modal-title">Новая заявка</h2>
+      <button class="icon-btn" onclick="document.getElementById('modal-request').classList.remove('open')" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="req-modal-type">Тип</label>
+          <select class="form-input" id="req-modal-type">
+            <option value="renewal">Продление</option>
+            <option value="registration">Регистрация</option>
+            <option value="change">Изм. DNS</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="req-modal-client">Клиент *</label>
+          <select class="form-input" id="req-modal-client"></select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label" for="req-modal-domain">Домен *</label>
+          <input class="form-input" id="req-modal-domain" placeholder="example.ru" required>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label" for="req-modal-desc">Описание</label>
+          <input class="form-input" id="req-modal-desc" placeholder="Краткое описание заявки...">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('modal-request').classList.remove('open')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveRequest()">Создать</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Toast-контейнер ─── -->
+<div class="toast-cont" id="toast-container" role="status" aria-live="polite"></div>
+
+<!-- ─── Overlay мобильного меню ─── -->
+<div class="mob-overlay" id="mob-overlay" onclick="closeMobileMenu()"></div>
+
+<!-- ════════════════════════════════════════════
+     JAVASCRIPT: порядок подключения важен!
+     1. База данных (данные)
+     2. Утилиты (чистые функции)
+     3. Модули страниц
+     4. Главный модуль (app.js)
+     ════════════════════════════════════════════ -->
+<script src="data/db.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/pages/dashboard.js"></script>
+<script src="js/pages/domains.js"></script>
+<script src="js/pages/clients.js"></script>
+<script src="js/pages/requests.js"></script>
+<script src="js/pages/payments.js"></script>
+<script src="js/pages/reports.js"></script>
+<script src="js/app.js"></script>
+
+<!-- Инлайн-скрипт: заполнение динамических select'ов клиентами -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Заполняем все <select> клиентами
+  const clientSelects = [
+    'dom-client', 'dom-modal-client',
+    'req-modal-client'
+  ];
+  clientSelects.forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    clients.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.name;
+      sel.append(opt);
+    });
+  });
+
+  // Таблица договоров (статичная, без модуля)
+  const tbody = document.getElementById('con-tbody');
+  if (tbody) {
+    tbody.innerHTML = contracts.map(k => `
+      <tr>
+        <td>#${k.id}</td>
+        <td>${clientName(k.client)}</td>
+        <td>${fmtDate(k.date)}</td>
+        <td>${k.terms}</td>
+        <td><span class="badge badge-active"><span class="badge-dot"></span>Действует</span></td>
+      </tr>`).join('');
+  }
+});
+</script>
+
+</body>
+</html>
