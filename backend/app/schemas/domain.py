@@ -1,29 +1,37 @@
-from datetime import date, datetime
-from decimal import Decimal
+from datetime import datetime
 from pydantic import BaseModel
 
 
 class DomainBase(BaseModel):
-    name: str
-    registrar: str
-    client_id: int
-    reg_date: date
-    exp_date: date
-    status: str = "active"
-    price: Decimal = Decimal("0.00")
-    note: str | None = None
+    domain_name: str
+    registration_date: datetime
+    expiration_date: datetime
+    current_status_id: int
+    registrar_id: int
+    contract_id: int
+    assigned_engineer_id: int | None = None
+    is_deleted: bool = False
 
 
 class DomainCreate(DomainBase):
     pass
 
 
-class DomainUpdate(DomainBase):
-    pass
-
-
 class DomainRead(DomainBase):
     id: int
-    created_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
 
-    model_config = {"from_attributes": True}
+    class Config:
+        from_attributes = True
+
+
+class DomainUpdate(BaseModel):
+    domain_name: str | None = None
+    registration_date: datetime | None = None
+    expiration_date: datetime | None = None
+    current_status_id: int | None = None
+    registrar_id: int | None = None
+    contract_id: int | None = None
+    assigned_engineer_id: int | None = None
+    is_deleted: bool | None = None

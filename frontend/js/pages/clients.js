@@ -1,19 +1,7 @@
 async function loadClientsFromApi() {
   try {
-    const res = await fetch(`${API_BASE}/clients`);
-    if (!res.ok) throw new Error("Не удалось загрузить клиентов");
-
-    const data = await res.json();
-
-    clients = data.map(c => ({
-      id: c.id,
-      name: c.name,
-      contact: c.contact,
-      email: c.email,
-      phone: c.phone,
-      inn: c.inn
-    }));
-
+    const data = await api("/clients/");
+    clients = data.map(normalizeClient);
     renderClients();
     refillClientSelects();
   } catch (error) {
@@ -90,63 +78,55 @@ function openClientModal(id) {
 }
 
 async function saveClient() {
-  const id = document.getElementById('cli-modal-id').value.trim();
+  const id = document.getElementById("cli-modal-id").value.trim();
 
-  const payload = {
-    name: document.getElementById('cli-modal-name').value.trim(),
-    contact: document.getElementById('cli-modal-contact').value.trim(),
-    inn: document.getElementById('cli-modal-inn').value.trim(),
-    email: document.getElementById('cli-modal-email').value.trim(),
-    phone: document.getElementById('cli-modal-phone').value.trim()
+  const formData = {
+    name: document.getElementById("cli-modal-name").value.trim(),
+    contact: document.getElementById("cli-modal-contact").value.trim(),
+    inn: document.getElementById("cli-modal-inn").value.trim(),
+    email: document.getElementById("cli-modal-email").value.trim(),
+    phone: document.getElementById("cli-modal-phone").value.trim()
   };
 
-  if (!payload.name || !payload.contact) {
-    showToast('Заполните обязательные поля', 'error');
+  if (!formData.name || !formData.contact) {
+    showToast("Заполните обязательные поля", "error");
     return;
   }
 
   try {
-    const url = id ? `${API_BASE}/clients/${id}` : `${API_BASE}/clients`;
-    const method = id ? 'PUT' : 'POST';
+    const payload = clientToApi(formData);
 
-    const res = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) {
-      throw new Error('Ошибка сохранения клиента');
+    if (id) {
+      await api(`/clients/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+      });
+    } else {
+      await api("/clients/", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
     }
 
-    document.getElementById('modal-client').classList.remove('open');
-    showToast(id ? 'Клиент обновлён' : 'Клиент добавлен', 'success');
+    document.getElementById("modal-client").classList.remove("open");
+    showToast(id ? "Клиент обновлён" : "Клиент добавлен", "success");
     await loadClientsFromApi();
   } catch (error) {
     console.error(error);
-    showToast('Не удалось сохранить клиента', 'error');
+    showToast("Не удалось сохранить клиента", "error");
   }
 }
 
 async function deleteClient(id) {
-  if (!confirm('Удалить клиента?')) return;
+  if (!confirm("Удалить клиента?")) return;
 
   try {
-    const res = await fetch(`${API_BASE}/clients/${id}`, {
-      method: 'DELETE'
-    });
-
-    if (!res.ok) {
-      throw new Error('Ошибка удаления клиента');
-    }
-
-    showToast('Клиент удалён', 'info');
+    await api(`/clients/${id}`, { method: "DELETE" });
+    showToast("Клиент удалён", "info");
     await loadClientsFromApi();
   } catch (error) {
     console.error(error);
-    showToast('Не удалось удалить клиента', 'error');
+    showToast("Не удалось удалить клиента", "error");
   }
 }
 

@@ -1,42 +1,40 @@
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.database import Base, engine
-import app.models
+from fastapi import FastAPI
 
-from app.routers import clients, domains
-from app.routers.clients import router as clients_router
-from app.routers.requests import router as requests_router
+from app.api.health import router as health_router
+from app.api.users import router as users_router
+from app.api.auth import router as auth_router
+from app.api.clients import router as clients_router
+from app.api.directories import router as directories_router
+from app.api.contracts import router as contracts_router
+from app.api.domains import router as domains_router
+from app.api.requests import router as requests_router
+from app.api.events import router as events_router
+from app.api.payments import router as payments_router
 
-app = FastAPI(title="Domain Manager API", version="0.1.0")
+from app.core.config import settings
 
-origins = [
-    "http://localhost:63342",
-    "http://127.0.0.1:63342",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-]
-
-
-@app.on_event("startup")
-def on_startup():
-    Base.metadata.create_all(bind=engine)
-
+app = FastAPI(
+    title=settings.app_name,
+    debug=settings.debug
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(clients.router)
-app.include_router(domains.router)
+app.include_router(health_router)
+app.include_router(users_router)
+app.include_router(auth_router)
 app.include_router(clients_router)
+app.include_router(directories_router)
+app.include_router(contracts_router)
+app.include_router(domains_router)
 app.include_router(requests_router)
-
-
-@app.get("/")
-def root():
-    return {"message": "Domain Manager API is running"}
+app.include_router(events_router)
+app.include_router(payments_router)

@@ -1,16 +1,28 @@
-from sqlalchemy import Column, Integer, String, DateTime, Date, ForeignKey, func
-from app.database import Base
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text, BigInteger
+from app.db.base import Base
 
 
 class Request(Base):
     __tablename__ = "requests"
 
     id = Column(Integer, primary_key=True, index=True)
-    type = Column(String(50), nullable=False)
-    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
-    domain = Column(String(255), nullable=False)
-    date = Column(Date, nullable=False)  # <-- было String(20), теперь Date
-    status = Column(String(50), nullable=False, default="new")
-    assignee = Column(String(255), nullable=True)
-    description = Column(String(500), nullable=True)
-    created_at = Column(DateTime, server_default=func.now())
+    request_number = Column("request_number", String(100), nullable=False, unique=True)
+    created_date = Column("created_date", DateTime, nullable=False)
+
+    # Внешние ключи на справочники
+    request_type_id = Column("request_type_id", Integer, ForeignKey("request_types.id"), nullable=False)
+    execution_status_id = Column("execution_status_id", Integer, ForeignKey("request_statuses.id"), nullable=False)
+
+    # Внешние ключи на сущности
+    client_id = Column("client_id", Integer, ForeignKey("clients.id"), nullable=False)
+    contract_id = Column("contract_id", Integer, ForeignKey("contracts.id"), nullable=False)
+    domain_id = Column("domain_id", Integer, ForeignKey("domains.id"), nullable=True)
+
+    # Инженеры и создатели
+    assigned_engineer_id = Column("assigned_engineer_id", BigInteger, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    created_by_user_id = Column("created_by_user_id", BigInteger, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+
+    description = Column(Text, nullable=True)
+    is_deleted = Column("is_deleted", Boolean, default=False, nullable=False)
+    created_at = Column("created_at", DateTime, nullable=False)
+    updated_at = Column("updated_at", DateTime, nullable=False)

@@ -1,16 +1,19 @@
-from datetime import date, datetime
+from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional
 
 
 class RequestBase(BaseModel):
-    type: str
+    request_number: str
+    created_date: datetime
+    request_type_id: int
+    execution_status_id: int
     client_id: int
-    domain: str
-    date: date
-    status: str = "new"
-    assignee: Optional[str] = None
-    description: Optional[str] = None
+    contract_id: int
+    domain_id: int | None = None
+    assigned_engineer_id: int | None = None
+    created_by_user_id: int | None = None
+    description: str | None = None
+    is_deleted: bool = False
 
 
 class RequestCreate(RequestBase):
@@ -20,6 +23,7 @@ class RequestCreate(RequestBase):
 class RequestRead(RequestBase):
     id: int
     created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True

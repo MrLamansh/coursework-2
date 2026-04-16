@@ -1,5 +1,3 @@
-// js/app.js — Главный модуль приложения
-
 function showPage(name) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));

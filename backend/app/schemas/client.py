@@ -1,21 +1,36 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
+
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class ClientBase(BaseModel):
     name: str
-    contact: str
-    email: EmailStr
-    phone: str
-    inn: str
+    contact_person: str
+    email: str
+    phone: str | None = None
+    inn: str | None = None
+    user_id: int | None = None
+    is_deleted: bool = False
 
 
 class ClientCreate(ClientBase):
-    pass
+    user_id: int | None = None
+
+
+class ClientUpdate(BaseModel):
+    name: str | None = None
+    contact_person: str | None = None
+    email: str | None = None
+    phone: str | None = None
+    inn: str | None = None
+    is_deleted: bool | None = None
 
 
 class ClientRead(ClientBase):
     id: int
-    created_at: datetime | None = None
+    user_id: int | None
+    is_deleted: bool
+    created_at: datetime
+    updated_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)

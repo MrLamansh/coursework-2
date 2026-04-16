@@ -1,50 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="a65856c1-953b-465d-a0b0-fa9f03ed028c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/coursework-2.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/database.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/client.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/domain.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/request.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/routers/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/routers/clients.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/routers/domains.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/routers/requests.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/client.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/domain.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/request.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/css/base.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/css/components.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/css/layout.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/css/tokens.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/data/db.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/domain-manager.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/app.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/pages/clients.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/pages/dashboard.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/pages/domains.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/pages/payments.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/pages/reports.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/pages/requests.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/utils.js" afterDir="false" />
+    <list default="true" id="a65856c1-953b-465d-a0b0-fa9f03ed028c" name="Changes" comment="Работают: реестр доменов, клиенты, заявки">
+      <change afterPath="$PROJECT_DIR$/backend/MIGRATIONS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/api/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/api/auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/api/clients.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/api/contracts.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/api/directories.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/api/domains.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/api/events.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/api/health.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/api/payments.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/api/requests.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/api/users.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/core/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/core/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/core/deps.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/core/security.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/db/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/db/base.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/db/session.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/models/contract.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/models/directories.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/models/event.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/models/payment.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/models/user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/contract.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/directories.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/event.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/payment.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/hash_passwords.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/coursework-2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/coursework-2.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/database.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/domain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/domain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/request.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/request.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routers/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routers/clients.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routers/domains.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routers/requests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/domain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/domain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/request.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/request.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/data/db.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/data/db.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/js/pages/clients.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/pages/clients.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/js/pages/domains.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/pages/domains.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_C:/Users/koles/Desktop/my-telegram-app/coursework-2" value="3C4sl664zosMznMv1Vb5oAdHwVF" />
+    </persistenceIdMap>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -55,6 +78,22 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;MrLamansh&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/MrLamansh/coursework-2.git&quot;,
+    &quot;accountId&quot;: &quot;2def41ec-f22a-40e2-83c4-0a9890e46f0d&quot;
+  }
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -70,13 +109,24 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.hash_passwords.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/koles/Desktop/my-telegram-app/coursework-2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -88,10 +138,41 @@
       <recent name="C:\Users\koles\Desktop\my-telegram-app\coursework-2\backend\app" />
     </key>
   </component>
+  <component name="RunManager">
+    <configuration name="hash_passwords" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="coursework-2" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/hash_passwords.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.hash_passwords" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-f2b7a9f6281b-6e1f45a539f7-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.29346.142" />
+        <option value="bundled-python-sdk-b63d5a1f7c97-b61e75351b1f-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.22158.340" />
       </set>
     </attachedChunks>
   </component>
@@ -104,5 +185,16 @@
       <updated>1775656325100</updated>
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
   </component>
 </project>
