@@ -95,3 +95,22 @@ function globalSearch(q) {
 document.addEventListener("DOMContentLoaded", () => {
   showPage("dashboard");
 });
+
+window.showPage = function(pageId) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+
+  const page = document.getElementById(`page-${pageId}`);
+  if (page) page.classList.add('active');
+
+  const link = document.querySelector(`.nav-link[onclick="showPage('${pageId}')"]`);
+  if (link) link.classList.add('active');
+
+  // Вызываем нужный загрузчик при переключении вкладок
+  if (pageId === 'dashboard' && window.renderDashboard) window.renderDashboard();
+  if (pageId === 'clients' && window.loadClientsFromApi) window.loadClientsFromApi();
+  if (pageId === 'domains' && window.loadDomainsFromApi) window.loadDomainsFromApi();
+  if (pageId === 'requests' && window.loadRequestsFromApi) window.loadRequestsFromApi();
+  if (pageId === 'contracts' && window.loadContractsFromApi) window.loadContractsFromApi();
+  if (pageId === 'payments' && window.loadPaymentsFromApi) window.loadPaymentsFromApi();
+};

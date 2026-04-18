@@ -27,3 +27,12 @@ class RequestRead(RequestBase):
 
     class Config:
         from_attributes = True
+
+class RequestUpdate(BaseModel):
+    execution_status_id: int | None = None
+    assigned_engineer_id: int | None = None
+    description: str | None = None
+    is_deleted: bool | None = None
+
+    class Config:
+        from_attributes = True

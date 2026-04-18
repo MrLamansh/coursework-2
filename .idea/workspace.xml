@@ -4,57 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a65856c1-953b-465d-a0b0-fa9f03ed028c" name="Changes" comment="Работают: реестр доменов, клиенты, заявки">
-      <change afterPath="$PROJECT_DIR$/backend/MIGRATIONS.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/api/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/api/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/api/clients.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/api/contracts.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/api/directories.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/api/domains.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/api/events.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/api/health.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/api/payments.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/api/requests.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/api/users.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/core/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/core/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/core/deps.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/core/security.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/db/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/db/base.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/db/session.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/contract.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/directories.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/event.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/payment.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/user.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/contract.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/directories.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/event.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/payment.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/user.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/hash_passwords.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/coursework-2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/coursework-2.iml" afterDir="false" />
+    <list default="true" id="a65856c1-953b-465d-a0b0-fa9f03ed028c" name="Changes" comment="Переработан весь бэк, кое-что привязано к фронту">
+      <change afterPath="$PROJECT_DIR$/AGENTS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/services/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/services/domain_checker.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/services/domain_scheduler.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/js/pages/contracts.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/database.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/domains.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/domains.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/requests.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/requests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/users.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/domain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/domain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/event.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/event.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/payment.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/payment.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/models/request.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/request.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routers/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routers/clients.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routers/domains.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routers/requests.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/schemas/domain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/domain.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/schemas/request.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/request.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/data/db.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/data/db.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/domain-manager.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/domain-manager.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/js/pages/clients.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/pages/clients.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/js/pages/domains.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/pages/domains.js" afterDir="false" />
@@ -72,6 +41,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="HTML File" />
+        <option value="JavaScript File" />
         <option value="Python Script" />
       </list>
     </option>
@@ -91,6 +62,9 @@
     &quot;accountId&quot;: &quot;2def41ec-f22a-40e2-83c4-0a9890e46f0d&quot;
   }
 }</component>
+  <component name="HttpClientOnboardingState">{
+  &quot;isOnboardingCommentShown&quot;: true
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -108,6 +82,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;Python.hash_passwords.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
@@ -132,6 +107,8 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\koles\Desktop\my-telegram-app\coursework-2" />
+      <recent name="C:\Users\koles\Desktop\my-telegram-app\coursework-2\frontend" />
+      <recent name="C:\Users\koles\Desktop\my-telegram-app\coursework-2\frontend\js" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\koles\Desktop\my-telegram-app\coursework-2\frontend" />
@@ -184,10 +161,23 @@
       <option name="presentableId" value="Default" />
       <updated>1775656325100</updated>
     </task>
+    <task id="LOCAL-00001" summary="Переработан весь бэк, кое-что привязано к фронту">
+      <option name="closed" value="true" />
+      <created>1776349619038</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1776349619038</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Переработан весь бэк, кое-что привязано к фронту" />
+    <option name="LAST_COMMIT_MESSAGE" value="Переработан весь бэк, кое-что привязано к фронту" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

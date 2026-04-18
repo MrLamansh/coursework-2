@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text, BigInteger
 from app.db.base import Base
+from sqlalchemy.sql import func
 
 
 class Request(Base):
@@ -24,5 +25,5 @@ class Request(Base):
 
     description = Column(Text, nullable=True)
     is_deleted = Column("is_deleted", Boolean, default=False, nullable=False)
-    created_at = Column("created_at", DateTime, nullable=False)
-    updated_at = Column("updated_at", DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())

@@ -18,10 +18,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/login", response_model=Token)
-def login(
-    credentials: UserLogin,
-    db: Session = Depends(get_db),
-):
+def login(credentials: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == credentials.username).first()
     if user is None or not verify_password(credentials.password, user.password_hash):
         raise HTTPException(

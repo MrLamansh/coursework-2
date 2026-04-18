@@ -61,21 +61,16 @@ function renderClients() {
   }).join("");
 }
 
-function openClientModal(id) {
-  const c = id ? clients.find(x => x.id == id) : null;
-
-  document.getElementById('cli-modal-title').textContent =
-    c ? 'Редактировать клиента' : 'Добавить клиента';
-
-  document.getElementById('cli-modal-id').value = c?.id || '';
-  document.getElementById('cli-modal-name').value = c?.name || '';
+window.openClientModal = function(id) {
+  const c = id ? window.clients.find(x => x.id === id) : null;
+  document.getElementById('cli-modal-title').textContent = c ? 'Редактировать клиента' : 'Добавить клиента';
+  document.getElementById('cli-modal-id').value      = c?.id || '';
+  document.getElementById('cli-modal-name').value    = c?.name || '';
   document.getElementById('cli-modal-contact').value = c?.contact || '';
-  document.getElementById('cli-modal-inn').value = c?.inn || '';
-  document.getElementById('cli-modal-email').value = c?.email || '';
-  document.getElementById('cli-modal-phone').value = c?.phone || '';
-
+  document.getElementById('cli-modal-email').value   = c?.email || '';
+  document.getElementById('cli-modal-phone').value   = c?.phone || '';
   document.getElementById('modal-client').classList.add('open');
-}
+};
 
 async function saveClient() {
   const id = document.getElementById("cli-modal-id").value.trim();

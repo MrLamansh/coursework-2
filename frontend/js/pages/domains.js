@@ -1,28 +1,13 @@
-async function loadDomainsFromApi() {
+window.loadDomainsFromApi = async function() {
   try {
-    const res = await fetch(`${API_BASE}/domains`);
-    if (!res.ok) throw new Error('Не удалось загрузить домены');
-
-    const data = await res.json();
-
-    domains = data.map(d => ({
-      id: d.id,
-      name: d.name,
-      client: d.client_id,
-      registrar: d.registrar,
-      regDate: d.reg_date,
-      expDate: d.exp_date,
-      price: Number(d.price),
-      status: d.status,
-      note: d.note || ''
-    }));
-
+    const data = await window.api("/domains/");
+    window.domains = data.map(window.normalizeDomain);
     renderDomains();
   } catch (error) {
     console.error(error);
     showToast('Ошибка загрузки доменов с сервера', 'error');
   }
-}
+};
 
 function renderDomains() {
   const search   = document.getElementById('dom-search')?.value.toLowerCase() || '';
@@ -30,7 +15,7 @@ function renderDomains() {
   const fReg     = document.getElementById('dom-registrar')?.value || '';
   const fClient  = document.getElementById('dom-client')?.value || '';
 
-  let list = [...domains];
+  let list = [...window.domains];
   if (search)  list = list.filter(d => d.name.toLowerCase().includes(search));
   if (fStatus) list = list.filter(d => d.status === fStatus);
   if (fReg)    list = list.filter(d => d.registrar === fReg);
@@ -39,23 +24,34 @@ function renderDomains() {
   const tbody = document.getElementById('dom-tbody');
   if (!tbody) return;
 
+  // Вспомогательные функции, которые у тебя где-то есть в utils.js (оставляем их)
+  const safeDaysUntil = typeof daysUntil === 'function' ? daysUntil : () => 0;
+  const safeDaysLeftStyle = typeof daysLeftStyle === 'function' ? daysLeftStyle : () => ({cls: '', label: ''});
+  const safeExpiryPercent = typeof expiryPercent === 'function' ? expiryPercent : () => 0;
+  const safeBarColor = typeof barColor === 'function' ? barColor : () => '#ccc';
+  const safeClientName = typeof clientName === 'function' ? clientName : (id) => `Клиент #${id}`;
+  const safeFmtDate = typeof fmtDate === 'function' ? fmtDate : (d) => d;
+  const safeFmtMoney = typeof fmtMoney === 'function' ? fmtMoney : (m) => m;
+  const safeDomainBadge = typeof domainBadge === 'function' ? domainBadge : (s) => s;
+
   tbody.innerHTML = list.map(d => {
-    const days = daysUntil(d.expDate);
-    const {cls, label} = daysLeftStyle(days);
-    const pct = expiryPercent(d.regDate, d.expDate);
+    const days = safeDaysUntil(d.expDate);
+    const {cls, label} = safeDaysLeftStyle(days);
+    const pct = safeExpiryPercent(d.regDate, d.expDate);
+    
     return `
       <tr>
         <td><span class="domain-name">${d.name}</span></td>
-        <td>${clientName(d.client)}</td>
+        <td>${safeClientName(d.client)}</td>
         <td>${d.registrar}</td>
-        <td>${fmtDate(d.expDate)}</td>
+        <td>${safeFmtDate(d.expDate)}</td>
         <td><span class="days-left ${cls}">${label}</span>
           <div class="expiry-bar" style="margin-top:4px">
-            <div class="expiry-fill" style="width:${pct}%;background:${barColor(pct)}"></div>
+            <div class="expiry-fill" style="width:${pct}%;background:${safeBarColor(pct)}"></div>
           </div>
         </td>
-        <td>${fmtMoney(d.price)}</td>
-        <td>${domainBadge(d.status)}</td>
+        <td>${safeFmtMoney(d.price)}</td>
+        <td>${safeDomainBadge(d.status)}</td>
         <td>
           <div class="row-actions">
             <button class="row-btn" onclick="openDomainModal(${d.id})" title="Редактировать">
@@ -77,8 +73,8 @@ function renderDomains() {
   }).join('') || '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--color-text-muted)">Нет доменов</td></tr>';
 }
 
-function openDomainModal(id) {
-  const d = id ? domains.find(x=>x.id===id) : null;
+window.openDomainModal = function(id) {
+  const d = id ? window.domains.find(x => x.id === id) : null;
   document.getElementById('dom-modal-title').textContent = d ? 'Редактировать домен' : 'Добавить домен';
   document.getElementById('dom-modal-id').value      = d?.id || '';
   document.getElementById('dom-modal-name').value    = d?.name || '';
@@ -90,9 +86,9 @@ function openDomainModal(id) {
   document.getElementById('dom-modal-status').value  = d?.status || 'active';
   document.getElementById('dom-modal-note').value    = d?.note || '';
   document.getElementById('modal-domain').classList.add('open');
-}
+};
 
-async function saveDomain() {
+window.saveDomain = async function() {
   const id = +document.getElementById('dom-modal-id').value;
   const name = document.getElementById('dom-modal-name').value.trim();
   const client = +document.getElementById('dom-modal-client').value;
@@ -102,58 +98,50 @@ async function saveDomain() {
     return;
   }
 
-  const payload = {
+  // Собираем данные с формы
+  const formData = {
     name,
     client_id: client,
     registrar: document.getElementById('dom-modal-reg').value.trim(),
     reg_date: document.getElementById('dom-modal-regdate').value,
     exp_date: document.getElementById('dom-modal-expdate').value,
-    price: +document.getElementById('dom-modal-price').value || 0,
-    status: document.getElementById('dom-modal-status').value,
-    note: document.getElementById('dom-modal-note').value.trim()
+    status: document.getElementById('dom-modal-status').value
   };
 
   try {
-    const url = id ? `${API_BASE}/domains/${id}` : `${API_BASE}/domains`;
-    const method = id ? 'PUT' : 'POST';
+    // Конвертируем в формат API
+    const payload = window.domainToApi(formData);
 
-    const res = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) {
-      throw new Error('Ошибка сохранения домена');
+    if (id) {
+      await window.api(`/domains/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+      });
+    } else {
+      await window.api("/domains/", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
     }
 
     document.getElementById('modal-domain').classList.remove('open');
     showToast(id ? 'Домен обновлён' : 'Домен добавлен', 'success');
-    await loadDomainsFromApi();
+    await window.loadDomainsFromApi();
   } catch (error) {
     console.error(error);
     showToast('Не удалось сохранить домен', 'error');
   }
-}
+};
 
-async function deleteDomain(id) {
+window.deleteDomain = async function(id) {
   if (!confirm('Удалить домен?')) return;
 
   try {
-    const res = await fetch(`${API_BASE}/domains/${id}`, {
-      method: 'DELETE'
-    });
-
-    if (!res.ok) {
-      throw new Error('Ошибка удаления домена');
-    }
-
+    await window.api(`/domains/${id}`, { method: 'DELETE' });
     showToast('Домен удалён', 'info');
-    await loadDomainsFromApi();
+    await window.loadDomainsFromApi();
   } catch (error) {
     console.error(error);
     showToast('Не удалось удалить домен', 'error');
   }
-}
+};
