@@ -3,17 +3,13 @@ from pydantic import BaseModel
 
 
 class RequestBase(BaseModel):
-    request_number: str
-    created_date: datetime
     request_type_id: int
     execution_status_id: int
     client_id: int
-    contract_id: int
+    contract_id: int | None = None
     domain_id: int | None = None
     assigned_engineer_id: int | None = None
-    created_by_user_id: int | None = None
     description: str | None = None
-    is_deleted: bool = False
 
 
 class RequestCreate(RequestBase):
@@ -22,14 +18,21 @@ class RequestCreate(RequestBase):
 
 class RequestRead(RequestBase):
     id: int
+    request_number: str
+    is_deleted: bool
     created_at: datetime
     updated_at: datetime
 
     class Config:
         from_attributes = True
 
+
 class RequestUpdate(BaseModel):
+    request_type_id: int | None = None
     execution_status_id: int | None = None
+    client_id: int | None = None
+    contract_id: int | None = None
+    domain_id: int | None = None
     assigned_engineer_id: int | None = None
     description: str | None = None
     is_deleted: bool | None = None

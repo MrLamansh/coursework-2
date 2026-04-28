@@ -40,7 +40,6 @@ class DomainBase(BaseModel):
     current_status_id: int
     registrar_id: int
     contract_id: int
-    assigned_engineer_id: int | None = None
 
 
 class DomainCreate(DomainBase):
@@ -54,7 +53,6 @@ class DomainUpdate(BaseModel):
     current_status_id: int | None = None
     registrar_id: int | None = None
     contract_id: int | None = None
-    assigned_engineer_id: int | None = None
     is_deleted: bool | None = None
 
 

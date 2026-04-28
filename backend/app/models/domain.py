@@ -14,14 +14,12 @@ class Domain(Base):
     current_status_id = Column(Integer, ForeignKey("domain_statuses.id"), nullable=False)
     registrar_id = Column(Integer, ForeignKey("registrars.id"), nullable=False)
     contract_id = Column(Integer, ForeignKey("contracts.id"), nullable=False)
-    assigned_engineer_id = Column(BigInteger, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
 
     is_deleted = Column(Boolean, default=False, nullable=False)
-    created_at = Column("created_at", DateTime, nullable=False, server_default=func.now())
-    updated_at = Column("updated_at", DateTime, nullable=False, server_default=func.now())
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now())
 
     # Связи
     status = relationship("DomainStatus", back_populates="domains")
     registrar = relationship("Registrar", back_populates="domains")
     contract = relationship("Contract", back_populates="domains")
-    assigned_engineer = relationship("User", back_populates="assigned_domains")

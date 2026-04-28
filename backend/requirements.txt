@@ -8,3 +8,6 @@ alembic
 python-whois
 bcrypt
 apscheduler
+python-jose[cryptography]
+passlib[bcrypt]
+openpyxl

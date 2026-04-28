@@ -8,7 +8,6 @@ class ContractBase(BaseModel):
     status_id: int
     client_id: int
     payment_terms: str | None = None
-    is_deleted: bool = False
 
 
 class ContractCreate(ContractBase):
@@ -17,6 +16,7 @@ class ContractCreate(ContractBase):
 
 class ContractRead(ContractBase):
     id: int
+    is_deleted: bool
     created_at: datetime
     updated_at: datetime
 
@@ -31,3 +31,6 @@ class ContractUpdate(BaseModel):
     client_id: int | None = None
     payment_terms: str | None = None
     is_deleted: bool | None = None
+
+    class Config:
+        from_attributes = True

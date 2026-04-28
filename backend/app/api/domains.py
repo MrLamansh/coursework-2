@@ -1,82 +1,105 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from datetime import datetime, timedelta
+
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from app.core.email_sender import send_email
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
-from app.services.domain_checker import check_whois
-from app.models.event import DomainEvent
-from app.services.domain_scheduler import run_daily_check
 
-from app.core.deps import require_role
+from app.core.deps import require_role, get_current_user
 from app.db.session import get_db
 from app.models.domain import Domain
-from app.schemas.domain import DomainCreate, DomainRead, DomainUpdate
 from app.models.contract import Contract
-from datetime import datetime, timedelta
+from app.models.event import DomainEvent
+from app.models.user import User
+from app.models.client import Client
+from app.schemas.domain import DomainCreate, DomainRead, DomainUpdate
+from app.services.domain_checker import check_whois
+from app.services.domain_scheduler import run_daily_check
 
 router = APIRouter(prefix="/domains", tags=["Domains"])
 
 
-@router.get("/", response_model=list[DomainRead])
+@router.get(
+    "/",
+    response_model=list[DomainRead],
+    dependencies=[Depends(require_role("manager", "engineer", "client"))],
+)
 def list_domains(
-        db: Session = Depends(get_db),
-        # Если у тебя есть get_current_user, можешь добавить его сюда
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    """
-    Получить список всех доменов.
-    Использует joinedload для подгрузки связанных данных (контракт, статус, регистратор).
-    """
-    domains = (
+    query = (
         db.query(Domain)
         .options(
             joinedload(Domain.status),
             joinedload(Domain.registrar),
-            # Подгружаем контракт, а через него - клиента
-            joinedload(Domain.contract).joinedload(Contract.client)
+            joinedload(Domain.contract).joinedload(Contract.client),
         )
         .filter(Domain.is_deleted.is_(False))
-        .order_by(Domain.expiration_date)  # Сортируем по дате окончания, это логичнее
-        .all()
     )
+
+    # Если клиент, показать только домены своего клиента
+    if current_user.role == "client":
+        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        if not client:
+            return []
+        query = query.filter(Contract.client_id == client.id)
+
+    domains = query.order_by(Domain.expiration_date).all()
     return domains
 
 
-@router.get("/expiring", response_model=list[DomainRead])
+@router.get(
+    "/expiring",
+    response_model=list[DomainRead],
+    dependencies=[Depends(require_role("manager", "engineer", "client"))],
+)
 def get_expiring_domains(
         days: int = 30,
         db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ):
-    """
-    Получить домены, у которых до истечения осталось не более `days` дней.
-    По умолчанию: 30 дней.
-    """
     threshold = datetime.utcnow() + timedelta(days=days)
-    domains = (
+    query = (
         db.query(Domain)
         .options(
             joinedload(Domain.status),
             joinedload(Domain.registrar),
-            joinedload(Domain.contract).joinedload(Contract.client)
+            joinedload(Domain.contract).joinedload(Contract.client),
         )
         .filter(
             Domain.is_deleted.is_(False),
-            Domain.expiration_date <= threshold
+            Domain.expiration_date <= threshold,
         )
-        .order_by(Domain.expiration_date)
-        .all()
     )
+
+    # Если клиент, показать только домены своего клиента
+    if current_user.role == "client":
+        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        if not client:
+            return []
+        query = query.filter(Contract.client_id == client.id)
+
+    domains = query.order_by(Domain.expiration_date).all()
     return domains
 
 
-@router.get("/{domain_id}", response_model=DomainRead)
+@router.get(
+    "/{domain_id}",
+    response_model=DomainRead,
+    dependencies=[Depends(require_role("manager", "engineer", "client"))],
+)
 def get_domain(
         domain_id: int,
         db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ):
     domain = (
         db.query(Domain)
         .options(
             joinedload(Domain.status),
             joinedload(Domain.registrar),
-            joinedload(Domain.contract).joinedload(Contract.client)
+            joinedload(Domain.contract).joinedload(Contract.client),
         )
         .filter(Domain.id == domain_id, Domain.is_deleted.is_(False))
         .first()
@@ -86,10 +109,25 @@ def get_domain(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Domain not found",
         )
+
+    # Если клиент, проверить что это его домен
+    if current_user.role == "client":
+        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        if not client or domain.contract.client_id != client.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Доступ запрещён",
+            )
+
     return domain
 
 
-@router.post("/", response_model=DomainRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=DomainRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_role("manager"))],
+)
 def create_domain(
         domain_in: DomainCreate,
         db: Session = Depends(get_db),
@@ -106,22 +144,26 @@ def create_domain(
         if "unique" in error_msg:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Domain with this name already exists"
+                detail="Domain with this name already exists",
             )
         if "foreign key" in error_msg:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid foreign key: check contract_id, registrar_id or status_id"
+                detail="Invalid foreign key: check contract_id, registrar_id or status_id",
             )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Database integrity error"
+            detail="Database integrity error",
         )
 
     return domain
 
 
-@router.put("/{domain_id}", response_model=DomainRead)
+@router.put(
+    "/{domain_id}",
+    response_model=DomainRead,
+    dependencies=[Depends(require_role("manager"))],
+)
 def update_domain(
         domain_id: int,
         domain_in: DomainUpdate,
@@ -150,13 +192,17 @@ def update_domain(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Database integrity error during update"
+            detail="Database integrity error during update",
         )
 
     return domain
 
 
-@router.delete("/{domain_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{domain_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_role("manager"))],
+)
 def delete_domain(
         domain_id: int,
         db: Session = Depends(get_db),
@@ -174,15 +220,15 @@ def delete_domain(
     return None
 
 
-@router.post("/{domain_id}/whois-check")
+@router.post(
+    "/{domain_id}/whois-check",
+    dependencies=[Depends(require_role("manager", "engineer", "client"))],
+)
 def whois_check(
         domain_id: int,
         db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ):
-    """
-    Проверить домен через WHOIS и сравнить с данными в БД.
-    Записывает событие в историю домена.
-    """
     domain = (
         db.query(Domain)
         .filter(Domain.id == domain_id, Domain.is_deleted.is_(False))
@@ -191,12 +237,21 @@ def whois_check(
     if not domain:
         raise HTTPException(status_code=404, detail="Domain not found")
 
+    # Если клиент, проверить что это его домен
+    if current_user.role == "client":
+        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        if not client or domain.contract.client_id != client.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Доступ запрещён",
+            )
+
     result = check_whois(domain.domain_name)
 
     if result["status"] == "error":
         raise HTTPException(
             status_code=502,
-            detail=f"WHOIS error: {result['error']}"
+            detail=f"WHOIS error: {result['error']}",
         )
 
     whois_exp = result["expiration_date"]
@@ -212,10 +267,9 @@ def whois_check(
 
     event = DomainEvent(
         event_type_id=1,
-        event_date=datetime.utcnow(),
         notes=note,
         domain_id=domain.id,
-        created_at=datetime.utcnow()
+        created_at=datetime.utcnow(),
     )
     db.add(event)
     db.commit()
@@ -225,10 +279,73 @@ def whois_check(
         "db_expiration": db_exp,
         "whois_expiration": whois_exp,
         "whois_registrar": result["registrar"],
-        "mismatch": mismatch
+        "mismatch": mismatch,
     }
 
-@router.post("/trigger-check", tags=["Debug"])
+
+@router.post(
+    "/expiring/notify",
+    dependencies=[Depends(require_role("manager"))],
+)
+def notify_expiring_domains(
+        days: int = 30,
+        background_tasks: BackgroundTasks = None,
+        db: Session = Depends(get_db),
+):
+    threshold = datetime.utcnow() + timedelta(days=days)
+
+    domains = (
+        db.query(Domain)
+        .options(
+            joinedload(Domain.status),
+            joinedload(Domain.registrar),
+            joinedload(Domain.contract).joinedload(Contract.client),
+        )
+        .filter(
+            Domain.is_deleted.is_(False),
+            Domain.expiration_date <= threshold,
+        )
+        .order_by(Domain.expiration_date)
+        .all()
+    )
+
+    notified = 0
+    skipped = 0
+
+    for domain in domains:
+        client = domain.contract.client if domain.contract else None
+
+        if not client or not client.email:
+            skipped += 1
+            continue
+
+        subject = "Напоминание о продлении домена"
+        body = (
+            f"Здравствуйте, {client.contact_person or client.name}!\n\n"
+            f"Напоминаем, что срок регистрации домена {domain.domain_name} "
+            f"истекает {domain.expiration_date.strftime('%Y-%m-%d')}.\n"
+            f"Рекомендуем своевременно продлить домен, чтобы избежать его деактивации.\n\n"
+            f"С уважением,\n"
+            f"служба поддержки"
+        )
+
+        background_tasks.add_task(send_email, client.email, subject, body)
+        notified += 1
+
+    return {
+        "status": "ok",
+        "message": "Уведомления поставлены в очередь на отправку",
+        "notified": notified,
+        "skipped": skipped,
+        "days": days,
+    }
+
+
+@router.post(
+    "/trigger-check",
+    tags=["Debug"],
+    dependencies=[Depends(require_role("manager", "engineer"))],
+)
 def trigger_check(db: Session = Depends(get_db)):
     """Ручной запуск ночной проверки доменов (для тестирования)."""
     run_daily_check(db)

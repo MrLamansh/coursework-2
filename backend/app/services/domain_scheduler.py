@@ -62,7 +62,6 @@ def run_daily_check(db: Session):
 
             new_request = Request(
                 request_number=request_number,
-                created_date=now,
                 request_type_id=2,
                 execution_status_id=1,
                 client_id=client_id,
@@ -77,7 +76,6 @@ def run_daily_check(db: Session):
 
             event = DomainEvent(
                 event_type_id=2,
-                event_date=now,
                 notes=f"Автозаявка {request_number} создана. Осталось {days_left} дней.",
                 domain_id=domain.id,
                 created_at=now

@@ -17,4 +17,3 @@ class User(Base):
     updated_at = Column("updated_at", DateTime, nullable=False, server_default=func.now())
 
     clients = relationship("Client", back_populates="user")
-    assigned_domains = relationship("Domain", back_populates="assigned_engineer")

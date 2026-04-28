@@ -4,26 +4,30 @@ from sqlalchemy.orm import Session
 from app.core.deps import require_role
 from app.db.session import get_db
 from app.models.client import Client
-from app.models.user import User
 from app.schemas.client import ClientCreate, ClientRead, ClientUpdate
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
 
 
-@router.get("/", response_model=list[ClientRead])
-def list_clients(
-    db: Session = Depends(get_db),
-):
-    clients = (
+@router.get(
+    "/",
+    response_model=list[ClientRead],
+    dependencies=[Depends(require_role("manager"))],
+)
+def list_clients(db: Session = Depends(get_db)):
+    return (
         db.query(Client)
         .filter(Client.is_deleted.is_(False))
         .order_by(Client.id)
         .all()
     )
-    return clients
 
 
-@router.get("/{client_id}", response_model=ClientRead)
+@router.get(
+    "/{client_id}",
+    response_model=ClientRead,
+    dependencies=[Depends(require_role("manager"))],
+)
 def get_client(
     client_id: int,
     db: Session = Depends(get_db),
@@ -41,7 +45,12 @@ def get_client(
     return client
 
 
-@router.post("/", response_model=ClientRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=ClientRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_role("manager"))],
+)
 def create_client(
     client_in: ClientCreate,
     db: Session = Depends(get_db),
@@ -59,7 +68,11 @@ def create_client(
     return client
 
 
-@router.put("/{client_id}", response_model=ClientRead)
+@router.put(
+    "/{client_id}",
+    response_model=ClientRead,
+    dependencies=[Depends(require_role("manager"))],
+)
 def update_client(
     client_id: int,
     client_in: ClientUpdate,
@@ -86,7 +99,11 @@ def update_client(
     return client
 
 
-@router.delete("/{client_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{client_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_role("manager"))],
+)
 def delete_client(
     client_id: int,
     db: Session = Depends(get_db),

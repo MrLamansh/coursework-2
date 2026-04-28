@@ -14,6 +14,7 @@ from app.api.domains import router as domains_router
 from app.api.requests import router as requests_router
 from app.api.events import router as events_router
 from app.api.payments import router as payments_router
+from app.api.reports import router as reports_router
 
 from app.core.config import settings
 from app.db.session import SessionLocal
@@ -66,12 +67,13 @@ app.add_middleware(
 )
 
 app.include_router(health_router)
-app.include_router(users_router)
 app.include_router(auth_router)
-app.include_router(clients_router)
+app.include_router(users_router)
 app.include_router(directories_router)
+app.include_router(clients_router)
 app.include_router(contracts_router)
 app.include_router(domains_router)
 app.include_router(requests_router)
 app.include_router(events_router)
 app.include_router(payments_router)
+app.include_router(reports_router)

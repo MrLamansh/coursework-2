@@ -16,7 +16,7 @@ class DirectoryRead(DirectoryBase):
 # Схема для регистратора (у него есть дополнительное поле websiteurl)
 class RegistrarBase(BaseModel):
     name: str
-    websiteurl: str | None = None
+    website_url: str | None = None
 
 
 class RegistrarRead(RegistrarBase):
