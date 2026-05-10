@@ -1,7 +1,13 @@
 import apiClient from "./client";
 
-export async function getContracts() {
-  const response = await apiClient.get("/contracts/");
+export async function getContracts(clientId) {
+  const params = {};
+
+  if (clientId !== undefined && clientId !== null && clientId !== "") {
+    params.client_id = clientId;
+  }
+
+  const response = await apiClient.get("/contracts/", { params });
   return response.data;
 }
 

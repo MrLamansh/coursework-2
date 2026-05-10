@@ -13,6 +13,7 @@ class User(Base):
     role = Column(String(20), nullable=False)
 
     is_active = Column("is_active", Boolean, default=True, nullable=False)
+    is_deleted = Column("is_deleted", Boolean, default=False, nullable=False)
     created_at = Column("created_at", DateTime, nullable=False, server_default=func.now())
     updated_at = Column("updated_at", DateTime, nullable=False, server_default=func.now())
 

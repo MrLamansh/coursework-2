@@ -5,6 +5,11 @@ export async function getRequests() {
   return response.data;
 }
 
+export async function getMyRequests() {
+  const response = await apiClient.get("/requests/my");
+  return response.data;
+}
+
 export async function getRequest(requestId) {
   const response = await apiClient.get(`/requests/${requestId}`);
   return response.data;

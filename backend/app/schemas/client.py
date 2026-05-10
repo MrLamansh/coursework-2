@@ -23,6 +23,7 @@ class ClientUpdate(BaseModel):
     email: str | None = None
     phone: str | None = None
     inn: str | None = None
+    user_id: int | None = None
     is_deleted: bool | None = None
 
 

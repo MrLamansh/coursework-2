@@ -13,6 +13,7 @@ import {
   getPaymentTypes,
 } from "../api/directories";
 import PaymentForm from "../forms/PaymentForm";
+import { formatMoney } from "../utils/formatMoney";
 
 const formatDate = (value) => {
   if (!value) {
@@ -26,17 +27,6 @@ const formatDate = (value) => {
   }
 
   return date.toLocaleDateString("ru-RU");
-};
-
-const formatCurrency = (value) => {
-  if (value === null || value === undefined) {
-    return "—";
-  }
-
-  const num = parseFloat(value);
-  return !Number.isNaN(num)
-    ? num.toLocaleString("ru-RU", { style: "currency", currency: "RUB" })
-    : String(value);
 };
 
 const getStatusLabel = (status) => {
@@ -209,7 +199,7 @@ function PaymentsPage() {
 
   const handleDeleteClick = async (payment) => {
     const confirmed = window.confirm(
-      `Удалить платёж на сумму ${formatCurrency(payment.amount)}?`
+      `Удалить платёж на сумму ${formatMoney(payment.amount)}?`
     );
 
     if (!confirmed) {
@@ -367,7 +357,7 @@ function PaymentsPage() {
               return (
                 <tr key={payment.id}>
                   <td style={cellStyle}>{payment.id}</td>
-                  <td style={cellStyle}>{formatCurrency(payment.amount)}</td>
+                  <td style={cellStyle}>{formatMoney(payment.amount)}</td>
                   <td style={cellStyle}>{paymentTypeLabel}</td>
                   <td style={cellStyle}>{paymentStatusLabel}</td>
                   <td style={cellStyle}>{contractLabel}</td>

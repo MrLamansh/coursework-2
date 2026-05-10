@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.security import decode_access_token
 from app.db.session import get_db
 from app.models.user import User
+from app.models.client import Client
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -29,7 +30,7 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user = db.query(User).filter(User.username == username).first()
+    user = db.query(User).filter(User.username == username, User.is_deleted.is_(False)).first()
     if user is None or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -61,3 +62,16 @@ def get_current_engineer(user: User = Depends(require_role("manager", "engineer"
 
 def get_current_any(user: User = Depends(get_current_user)) -> User:
     return user
+
+
+def get_current_client(
+    current_user: User = Depends(require_role("client")),
+    db: Session = Depends(get_db),
+) -> Client:
+    """Возвращает объект Client для текущего пользователя (role == 'client').
+    Поднимает 404 если связанный клиент не найден.
+    """
+    client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
+    if client is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client profile not found for user")
+    return client

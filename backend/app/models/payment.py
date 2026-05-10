@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, Boolean, DateTime, ForeignKey, Numeric
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.base import Base
 
@@ -20,3 +21,8 @@ class Payment(Base):
 
     created_at = Column(DateTime, nullable=False, server_default=func.now())
     updated_at = Column(DateTime, nullable=False, server_default=func.now())
+
+    # Relationships
+    payment_type = relationship("PaymentType")
+    payment_status = relationship("PaymentStatus")
+

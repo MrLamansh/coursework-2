@@ -1,7 +1,18 @@
 import apiClient from "./client";
 
-export async function getDomains() {
-  const response = await apiClient.get("/domains/");
+export async function getDomains(contractId) {
+  const params = {};
+
+  if (contractId !== undefined && contractId !== null && contractId !== "") {
+    params.contract_id = contractId;
+  }
+
+  const response = await apiClient.get("/domains/", { params });
+  return response.data;
+}
+
+export async function getMyDomains() {
+  const response = await apiClient.get("/domains/my");
   return response.data;
 }
 

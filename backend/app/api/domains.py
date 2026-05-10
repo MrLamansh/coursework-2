@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Any, cast
 
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from app.core.email_sender import send_email
@@ -14,9 +15,39 @@ from app.models.user import User
 from app.models.client import Client
 from app.schemas.domain import DomainCreate, DomainRead, DomainUpdate
 from app.services.domain_checker import check_whois
-from app.services.domain_scheduler import run_daily_check
+from app.services.domain_scheduler import run_daily_check, _sync_domain_status
 
 router = APIRouter(prefix="/domains", tags=["Domains"])
+
+
+@router.get(
+    "/my",
+    response_model=list[DomainRead],
+    dependencies=[Depends(require_role("client"))],
+)
+def get_my_domains(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Возвращает домены текущего клиента."""
+    client = db.query(Client).filter(Client.user_id == current_user.id).first()
+    if not client:
+        return []
+
+    query = (
+        db.query(Domain)
+        .options(
+            joinedload(Domain.status),
+            joinedload(Domain.registrar),
+            joinedload(Domain.contract).joinedload(Contract.client),
+        )
+        .filter(
+            Domain.is_deleted.is_(False),
+            Domain.contract.has(Contract.client_id == client.id),
+        )
+        .order_by(Domain.expiration_date)
+    )
+    return query.all()
 
 
 @router.get(
@@ -25,6 +56,7 @@ router = APIRouter(prefix="/domains", tags=["Domains"])
     dependencies=[Depends(require_role("manager", "engineer", "client"))],
 )
 def list_domains(
+    contract_id: int | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -43,7 +75,10 @@ def list_domains(
         client = db.query(Client).filter(Client.user_id == current_user.id).first()
         if not client:
             return []
-        query = query.filter(Contract.client_id == client.id)
+        query = query.filter(Domain.contract.has(Contract.client_id == client.id))
+
+    if contract_id is not None:
+        query = query.filter(getattr(Domain, "contract_id") == contract_id)
 
     domains = query.order_by(Domain.expiration_date).all()
     return domains
@@ -59,7 +94,7 @@ def get_expiring_domains(
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user),
 ):
-    threshold = datetime.utcnow() + timedelta(days=days)
+    threshold = datetime.now() + timedelta(days=days)
     query = (
         db.query(Domain)
         .options(
@@ -78,7 +113,7 @@ def get_expiring_domains(
         client = db.query(Client).filter(Client.user_id == current_user.id).first()
         if not client:
             return []
-        query = query.filter(Contract.client_id == client.id)
+        query = query.filter(Domain.contract.has(Contract.client_id == client.id))
 
     domains = query.order_by(Domain.expiration_date).all()
     return domains
@@ -162,12 +197,13 @@ def create_domain(
 @router.put(
     "/{domain_id}",
     response_model=DomainRead,
-    dependencies=[Depends(require_role("manager"))],
+    dependencies=[Depends(require_role("manager", "engineer"))],
 )
 def update_domain(
         domain_id: int,
         domain_in: DomainUpdate,
         db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ):
     domain = (
         db.query(Domain)
@@ -180,11 +216,29 @@ def update_domain(
             detail="Domain not found",
         )
 
+    # Если инженер, разрешить только регистрацию и регистратора
+    if current_user.role == "engineer":
+        update_data = domain_in.model_dump(exclude_unset=True)
+        allowed_fields = {"registration_date", "registrar_id"}
+        forbidden_fields = set(update_data.keys()) - allowed_fields
+        if forbidden_fields:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Engineer can only edit registration_date and registrar_id. Forbidden fields: {', '.join(forbidden_fields)}",
+            )
+
     update_data = domain_in.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(domain, field, value)
 
     try:
+        # Синхронизируем статус домена на основе expiration_date (если обновляли дату)
+        try:
+            _sync_domain_status(cast(Any, domain), db)
+        except Exception:
+            # Не критично — если синхронизация не удалась, всё равно пробуем сохранить остальные изменения
+            pass
+
         db.add(domain)
         db.commit()
         db.refresh(domain)
@@ -269,7 +323,7 @@ def whois_check(
         event_type_id=1,
         notes=note,
         domain_id=domain.id,
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(),
     )
     db.add(event)
     db.commit()
@@ -292,7 +346,7 @@ def notify_expiring_domains(
         background_tasks: BackgroundTasks = None,
         db: Session = Depends(get_db),
 ):
-    threshold = datetime.utcnow() + timedelta(days=days)
+    threshold = datetime.now() + timedelta(days=days)
 
     domains = (
         db.query(Domain)

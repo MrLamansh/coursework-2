@@ -1,20 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   createClient,
   deleteClient,
   getClients,
   updateClient,
 } from "../api/clients";
+import { getUsers } from "../api/users";
 import ClientForm from "../forms/ClientForm";
 
 function ClientsPage() {
   const [clients, setClients] = useState([]);
+  const [clientUsers, setClientUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formLoading, setFormLoading] = useState(false);
   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
+
+  const userById = useMemo(() => {
+    const map = new Map();
+    clientUsers.forEach((user) => {
+      map.set(user.id, user);
+    });
+    return map;
+  }, [clientUsers]);
 
   const loadClients = async () => {
     try {
@@ -31,8 +41,22 @@ function ClientsPage() {
     }
   };
 
+  const loadClientUsers = async () => {
+    try {
+      const users = await getUsers();
+      setClientUsers(users.filter((user) => user.role === "client"));
+    } catch (err) {
+      console.error(err);
+      setError(
+        err?.response?.data?.detail ||
+          "Не удалось загрузить пользователей для привязки"
+      );
+    }
+  };
+
   useEffect(() => {
     loadClients();
+    loadClientUsers();
   }, []);
 
   const handleCreateClick = () => {
@@ -115,6 +139,7 @@ function ClientsPage() {
           onCancel={handleCancelForm}
           loading={formLoading}
           initialData={editingClient}
+          userOptions={clientUsers}
         />
       )}
 
@@ -134,6 +159,7 @@ function ClientsPage() {
               <th style={cellStyle}>Email</th>
               <th style={cellStyle}>Телефон</th>
               <th style={cellStyle}>ИНН</th>
+              <th style={cellStyle}>Пользователь</th>
               <th style={cellStyle}>Действия</th>
             </tr>
           </thead>
@@ -146,6 +172,11 @@ function ClientsPage() {
                 <td style={cellStyle}>{client.email || "—"}</td>
                 <td style={cellStyle}>{client.phone || "—"}</td>
                 <td style={cellStyle}>{client.inn || "—"}</td>
+                <td style={cellStyle}>
+                  {client.user_id
+                    ? userById.get(client.user_id)?.username || `ID: ${client.user_id}`
+                    : "—"}
+                </td>
                 <td style={cellStyle}>
                   <div style={{ display: "flex", gap: "8px" }}>
                     <button
@@ -220,3 +251,4 @@ const cellStyle = {
 };
 
 export default ClientsPage;
+

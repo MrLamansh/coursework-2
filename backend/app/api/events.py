@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import List
 
 from fastapi import APIRouter, Depends, status
@@ -36,7 +36,7 @@ def create_event(
 ):
     new_event = DomainEvent(
         **event_in.model_dump(),
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
     )
     db.add(new_event)
     db.commit()

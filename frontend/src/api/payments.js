@@ -5,6 +5,11 @@ export async function getPayments() {
   return response.data;
 }
 
+export async function getMyPayments() {
+  const response = await apiClient.get("/payments/my");
+  return response.data;
+}
+
 export async function getPayment(paymentId) {
   const response = await apiClient.get(`/payments/${paymentId}`);
   return response.data;

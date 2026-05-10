@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { getContracts } from "../api/contracts";
+import { getDomains } from "../api/domains";
 
 const toOptionLabel = (item, fallbackPrefix) => {
   if (!item) {
@@ -37,6 +39,10 @@ function RequestForm({
 	assigned_engineer_id: "",
 	description: "",
   });
+  const [availableContracts, setAvailableContracts] = useState(null);
+  const [contractsLoading, setContractsLoading] = useState(false);
+  const [availableDomains, setAvailableDomains] = useState(null);
+  const [domainsLoading, setDomainsLoading] = useState(false);
 
   useEffect(() => {
 	if (initialData) {
@@ -62,8 +68,192 @@ function RequestForm({
 	}
   }, [initialData]);
 
+  const selectedClientId = normalizeNullableInt(formData.client_id);
+  const selectedContractId = normalizeNullableInt(formData.contract_id);
+
+  const fallbackContractsForClient = useMemo(() => {
+	if (!selectedClientId) {
+	  return [];
+	}
+
+	return contractOptions.filter(
+	  (contract) => String(contract.client_id) === String(selectedClientId)
+	);
+  }, [contractOptions, selectedClientId]);
+
+  const visibleContracts =
+	selectedClientId ? availableContracts ?? fallbackContractsForClient : [];
+
+  const fallbackDomainsForContract = useMemo(() => {
+	if (!selectedContractId) {
+	  return [];
+	}
+
+	return domainOptions.filter(
+	  (domain) => String(domain.contract_id) === String(selectedContractId)
+	);
+  }, [domainOptions, selectedContractId]);
+
+  const visibleDomains =
+	selectedContractId ? availableDomains ?? fallbackDomainsForContract : [];
+
+  useEffect(() => {
+	let isActive = true;
+
+	if (!selectedClientId) {
+	  setAvailableContracts([]);
+	  setContractsLoading(false);
+	  setFormData((prev) =>
+		prev.contract_id ? { ...prev, contract_id: "" } : prev
+	  );
+	  return () => {
+		isActive = false;
+	  };
+	}
+
+	const loadContracts = async () => {
+	  setContractsLoading(true);
+
+	  try {
+		const contracts = await getContracts(selectedClientId);
+		if (!isActive) {
+		  return;
+		}
+
+		setAvailableContracts(Array.isArray(contracts) ? contracts : []);
+		setFormData((prev) => {
+		  if (!prev.contract_id) {
+			return prev;
+		  }
+
+		  const hasSelectedContract = (Array.isArray(contracts) ? contracts : []).some(
+			(contract) => String(contract.id) === String(prev.contract_id)
+		  );
+
+		  return hasSelectedContract ? prev : { ...prev, contract_id: "" };
+		});
+	  } catch (error) {
+		if (!isActive) {
+		  return;
+		}
+
+		setAvailableContracts(fallbackContractsForClient);
+		setFormData((prev) => {
+		  if (!prev.contract_id) {
+			return prev;
+		  }
+
+		  const hasSelectedContract = fallbackContractsForClient.some(
+			(contract) => String(contract.id) === String(prev.contract_id)
+		  );
+
+		  return hasSelectedContract ? prev : { ...prev, contract_id: "" };
+		});
+	  } finally {
+		if (isActive) {
+		  setContractsLoading(false);
+		}
+	  }
+	};
+
+	loadContracts();
+
+	return () => {
+	  isActive = false;
+	};
+  }, [fallbackContractsForClient, selectedClientId]);
+
+  useEffect(() => {
+	let isActive = true;
+
+	if (!selectedContractId) {
+	  setAvailableDomains([]);
+	  setDomainsLoading(false);
+	  setFormData((prev) =>
+		prev.domain_id ? { ...prev, domain_id: "" } : prev
+	  );
+	  return () => {
+		isActive = false;
+	  };
+	}
+
+	const loadDomains = async () => {
+	  setDomainsLoading(true);
+
+	  try {
+		const domains = await getDomains(selectedContractId);
+		if (!isActive) {
+		  return;
+		}
+
+		const normalizedDomains = Array.isArray(domains) ? domains : [];
+		setAvailableDomains(normalizedDomains);
+		setFormData((prev) => {
+		  if (!prev.domain_id) {
+			return prev;
+		  }
+
+		  const hasSelectedDomain = normalizedDomains.some(
+			(domain) => String(domain.id) === String(prev.domain_id)
+		  );
+
+		  return hasSelectedDomain ? prev : { ...prev, domain_id: "" };
+		});
+	  } catch (error) {
+		if (!isActive) {
+		  return;
+		}
+
+		setAvailableDomains(fallbackDomainsForContract);
+		setFormData((prev) => {
+		  if (!prev.domain_id) {
+			return prev;
+		  }
+
+		  const hasSelectedDomain = fallbackDomainsForContract.some(
+			(domain) => String(domain.id) === String(prev.domain_id)
+		  );
+
+		  return hasSelectedDomain ? prev : { ...prev, domain_id: "" };
+		});
+	  } finally {
+		if (isActive) {
+		  setDomainsLoading(false);
+		}
+	  }
+	};
+
+	loadDomains();
+
+	return () => {
+	  isActive = false;
+	};
+  }, [fallbackDomainsForContract, selectedContractId]);
+
   const handleChange = (event) => {
 	const { name, value } = event.target;
+
+	if (name === "client_id") {
+	  setFormData((prev) => ({
+		...prev,
+		client_id: value,
+		contract_id: "",
+		domain_id: "",
+	  }));
+	  setAvailableContracts(null);
+	  setAvailableDomains(null);
+	  return;
+	}
+
+	if (name === "contract_id") {
+	  setFormData((prev) => ({
+		...prev,
+		contract_id: value,
+		domain_id: "",
+	  }));
+	  setAvailableDomains(null);
+	  return;
+	}
 
 	setFormData((prev) => ({
 	  ...prev,
@@ -88,8 +278,25 @@ function RequestForm({
   const hasRequestTypeOptions = requestTypeOptions.length > 0;
   const hasRequestStatusOptions = requestStatusOptions.length > 0;
   const hasClientOptions = clientOptions.length > 0;
-  const hasContractOptions = contractOptions.length > 0;
   const hasDomainOptions = domainOptions.length > 0;
+  const contractSelectDisabled =
+	!selectedClientId || contractsLoading || visibleContracts.length === 0;
+  const contractSelectPlaceholder = !selectedClientId
+	? "Сначала выберите клиента"
+	: contractsLoading
+	? "Загружаем договоры..."
+	: visibleContracts.length === 0
+	? "У клиента нет договоров"
+	: "Выберите договор";
+  const domainSelectDisabled =
+	!selectedContractId || domainsLoading || visibleDomains.length === 0;
+  const domainSelectPlaceholder = !selectedContractId
+	? "Сначала выберите договор"
+	: domainsLoading
+	? "Загружаем домены..."
+	: visibleDomains.length === 0
+	? "У договора нет доменов"
+	: "Выберите домен";
 
   return (
 	<form onSubmit={handleSubmit} style={formStyle}>
@@ -192,33 +399,21 @@ function RequestForm({
 
 	  <label style={labelStyle}>
 		Договор
-		{hasContractOptions ? (
 		  <select
 			name="contract_id"
 			value={formData.contract_id}
 			onChange={handleChange}
 			required
+			disabled={contractSelectDisabled}
 			style={inputStyle}
 		  >
-			<option value="">Выберите договор</option>
-			{contractOptions.map((contract) => (
+			<option value="">{contractSelectPlaceholder}</option>
+			{visibleContracts.map((contract) => (
 			  <option key={contract.id} value={contract.id}>
 				{contract.contact_number || `Договор #${contract.id}`}
 			  </option>
 			))}
 		  </select>
-		) : (
-		  <input
-			type="number"
-			name="contract_id"
-			placeholder="ID договора"
-			value={formData.contract_id}
-			onChange={handleChange}
-			required
-			min="1"
-			style={inputStyle}
-		  />
-		)}
 	  </label>
 
 	  <label style={labelStyle}>
@@ -228,10 +423,11 @@ function RequestForm({
 			name="domain_id"
 			value={formData.domain_id}
 			onChange={handleChange}
+			disabled={domainSelectDisabled}
 			style={inputStyle}
 		  >
-			<option value="">Без домена</option>
-			{domainOptions.map((domain) => (
+			<option value="">{domainSelectPlaceholder}</option>
+			{visibleDomains.map((domain) => (
 			  <option key={domain.id} value={domain.id}>
 				{domain.domain_name || `Домен #${domain.id}`}
 			  </option>

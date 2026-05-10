@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
 
-function ClientForm({ onSubmit, onCancel, loading, initialData = null }) {
+function ClientForm({
+  onSubmit,
+  onCancel,
+  loading,
+  initialData = null,
+  userOptions = [],
+}) {
   const [formData, setFormData] = useState({
     name: "",
     contact_person: "",
     email: "",
     phone: "",
     inn: "",
+    user_id: "",
   });
 
   useEffect(() => {
@@ -17,6 +24,10 @@ function ClientForm({ onSubmit, onCancel, loading, initialData = null }) {
         email: initialData.email || "",
         phone: initialData.phone || "",
         inn: initialData.inn || "",
+        user_id:
+          initialData.user_id === null || initialData.user_id === undefined
+            ? ""
+            : String(initialData.user_id),
       });
     } else {
       setFormData({
@@ -25,6 +36,7 @@ function ClientForm({ onSubmit, onCancel, loading, initialData = null }) {
         email: "",
         phone: "",
         inn: "",
+        user_id: "",
       });
     }
   }, [initialData]);
@@ -40,7 +52,11 @@ function ClientForm({ onSubmit, onCancel, loading, initialData = null }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    onSubmit(formData);
+
+    onSubmit({
+      ...formData,
+      user_id: formData.user_id === "" ? null : Number(formData.user_id),
+    });
   };
 
   return (
@@ -90,6 +106,20 @@ function ClientForm({ onSubmit, onCancel, loading, initialData = null }) {
         onChange={handleChange}
         style={inputStyle}
       />
+
+      <select
+        name="user_id"
+        value={formData.user_id}
+        onChange={handleChange}
+        style={inputStyle}
+      >
+        <option value="">Не привязывать пользователя</option>
+        {userOptions.map((user) => (
+          <option key={user.id} value={String(user.id)}>
+            {user.username} (id: {user.id})
+          </option>
+        ))}
+      </select>
 
       <div style={{ display: "flex", gap: "12px" }}>
         <button type="submit" disabled={loading} style={saveButtonStyle}>

@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List
 
 from app.core.deps import require_role, get_current_user
@@ -24,6 +24,7 @@ router = APIRouter(prefix="/contracts", tags=["Contracts"])
 def get_contracts(
     skip: int = 0,
     limit: int = 100,
+    client_id: int | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -31,12 +32,16 @@ def get_contracts(
 
     # Если клиент, показать только свои договоры
     if current_user.role == "client":
-        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client:
             return []
+        if client_id is not None and client_id != client.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещён")
         query = query.filter(Contract.client_id == client.id)
+    elif client_id is not None:
+        query = query.filter(Contract.client_id.in_([client_id]))
 
-    contracts = query.order_by(Contract.id).offset(skip).limit(limit).all()
+    contracts = query.options(joinedload(Contract.client)).order_by(Contract.id).offset(skip).limit(limit).all()
     return contracts
 
 
@@ -52,6 +57,7 @@ def get_contract(
 ):
     contract = (
         db.query(Contract)
+        .options(joinedload(Contract.client))
         .filter(Contract.id == contract_id, Contract.is_deleted.is_(False))
         .first()
     )
@@ -60,7 +66,7 @@ def get_contract(
 
     # Если клиент, проверить что это его договор
     if current_user.role == "client":
-        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client or contract.client_id != client.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -77,7 +83,7 @@ def get_contract(
     dependencies=[Depends(require_role("manager"))],
 )
 def create_contract(contract_in: ContractCreate, db: Session = Depends(get_db)):
-    client = db.query(Client).filter(Client.id == contract_in.client_id).first()
+    client = db.query(Client).filter(Client.id == contract_in.client_id, Client.is_deleted.is_(False)).first()
     if not client:
         raise HTTPException(status_code=404, detail="Указанный клиент не найден")
 
@@ -113,6 +119,7 @@ def create_contract(contract_in: ContractCreate, db: Session = Depends(get_db)):
 def update_contract(contract_id: int, contract_in: ContractUpdate, db: Session = Depends(get_db)):
     contract = (
         db.query(Contract)
+        .options(joinedload(Contract.client))
         .filter(Contract.id == contract_id, Contract.is_deleted.is_(False))
         .first()
     )
@@ -122,7 +129,7 @@ def update_contract(contract_id: int, contract_in: ContractUpdate, db: Session =
     update_data = contract_in.model_dump(exclude_unset=True)
 
     if "client_id" in update_data:
-        client = db.query(Client).filter(Client.id == update_data["client_id"]).first()
+        client = db.query(Client).filter(Client.id == update_data["client_id"], Client.is_deleted.is_(False)).first()
         if not client:
             raise HTTPException(status_code=404, detail="Указанный клиент не найден")
 
@@ -138,7 +145,7 @@ def update_contract(contract_id: int, contract_in: ContractUpdate, db: Session =
     for field, value in update_data.items():
         setattr(contract, field, value)
 
-    contract.updated_at = datetime.utcnow()
+    contract.updated_at = datetime.now(UTC)
 
     try:
         db.commit()
@@ -164,6 +171,6 @@ def delete_contract(contract_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Контракт не найден")
 
     contract.is_deleted = True
-    contract.updated_at = datetime.utcnow()
+    contract.updated_at = datetime.now(UTC)
     db.commit()
     return None

@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List
 
 from app.core.deps import require_role, get_current_user
@@ -15,6 +16,32 @@ from app.models.client import Client
 from app.schemas.payment import PaymentCreate, PaymentRead, PaymentUpdate
 
 router = APIRouter(prefix="/payments", tags=["Payments"])
+
+
+@router.get(
+    "/my",
+    response_model=List[PaymentRead],
+    dependencies=[Depends(require_role("client"))],
+)
+def get_my_payments(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Возвращает платежи по договорам текущего клиента."""
+    client = db.query(Client).filter(Client.user_id == current_user.id).first()
+    if not client:
+        return []
+
+    query = (
+        db.query(Payment)
+        .filter(Payment.is_deleted.is_(False))
+        .join(Contract)
+        .filter(Contract.client_id == client.id)
+        .order_by(Payment.id)
+    )
+    return query.offset(skip).limit(limit).all()
 
 
 @router.get(
@@ -91,19 +118,26 @@ def create_payment(payment_in: PaymentCreate, db: Session = Depends(get_db)):
     if not payment_status:
         raise HTTPException(status_code=404, detail="Статус платежа не найден")
 
-    contract = db.query(Contract).filter(Contract.id == payment_in.contract_id).first()
+    contract = db.query(Contract).filter(Contract.id == payment_in.contract_id, Contract.is_deleted.is_(False)).first()
     if not contract:
         raise HTTPException(status_code=404, detail="Контракт не найден")
 
     if payment_in.domain_id is not None:
-        domain = db.query(Domain).filter(Domain.id == payment_in.domain_id).first()
+        domain = db.query(Domain).filter(Domain.id == payment_in.domain_id, Domain.is_deleted.is_(False)).first()
         if not domain:
             raise HTTPException(status_code=404, detail="Домен не найден")
 
     new_payment = Payment(**payment_in.model_dump())
     db.add(new_payment)
-    db.commit()
-    db.refresh(new_payment)
+    try:
+        db.commit()
+        db.refresh(new_payment)
+    except IntegrityError as e:
+        db.rollback()
+        error_msg = str(e.orig).lower()
+        if "foreign key" in error_msg:
+            raise HTTPException(status_code=400, detail="Некорректная ссылка на договор или домен")
+        raise HTTPException(status_code=400, detail="Ошибка целостности данных при создании платежа")
     return new_payment
 
 
@@ -138,21 +172,28 @@ def update_payment(payment_id: int, payment_in: PaymentUpdate, db: Session = Dep
             raise HTTPException(status_code=404, detail="Статус платежа не найден")
 
     if "contract_id" in update_data:
-        contract = db.query(Contract).filter(Contract.id == update_data["contract_id"]).first()
+        contract = db.query(Contract).filter(Contract.id == update_data["contract_id"], Contract.is_deleted.is_(False)).first()
         if not contract:
             raise HTTPException(status_code=404, detail="Контракт не найден")
 
     if "domain_id" in update_data and update_data["domain_id"] is not None:
-        domain = db.query(Domain).filter(Domain.id == update_data["domain_id"]).first()
+        domain = db.query(Domain).filter(Domain.id == update_data["domain_id"], Domain.is_deleted.is_(False)).first()
         if not domain:
             raise HTTPException(status_code=404, detail="Домен не найден")
 
     for field, value in update_data.items():
         setattr(payment, field, value)
 
-    payment.updated_at = datetime.utcnow()
-    db.commit()
-    db.refresh(payment)
+    payment.updated_at = datetime.now(UTC)
+    try:
+        db.commit()
+        db.refresh(payment)
+    except IntegrityError as e:
+        db.rollback()
+        error_msg = str(e.orig).lower()
+        if "foreign key" in error_msg:
+            raise HTTPException(status_code=400, detail="Некорректная ссылка на договор или домен")
+        raise HTTPException(status_code=400, detail="Ошибка целостности данных при обновлении платежа")
     return payment
 
 
@@ -167,6 +208,6 @@ def delete_payment(payment_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Платёж не найден")
 
     payment.is_deleted = True
-    payment.updated_at = datetime.utcnow()
+    payment.updated_at = datetime.now(UTC)
     db.commit()
     return None

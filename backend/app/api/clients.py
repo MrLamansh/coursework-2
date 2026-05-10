@@ -1,12 +1,47 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.deps import require_role
 from app.db.session import get_db
 from app.models.client import Client
+from app.models.user import User
 from app.schemas.client import ClientCreate, ClientRead, ClientUpdate
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
+
+
+def _validate_client_user_link(db: Session, user_id: int | None, current_client_id: int | None = None) -> None:
+    """Проверка корректности привязки user_id к клиенту."""
+    if user_id is None:
+        return
+
+    user = db.query(User).filter(User.id == user_id, User.is_deleted.is_(False)).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Пользователь для привязки не найден",
+        )
+
+    if user.role != "client":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Можно привязать только пользователя с ролью client",
+        )
+
+    existing_client = (
+        db.query(Client)
+        .filter(
+            Client.user_id == user_id,
+            Client.is_deleted.is_(False),
+        )
+        .first()
+    )
+    if existing_client and existing_client.id != current_client_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Этот пользователь уже привязан к другому клиенту",
+        )
 
 
 @router.get(
@@ -55,16 +90,40 @@ def create_client(
     client_in: ClientCreate,
     db: Session = Depends(get_db),
 ):
+    _validate_client_user_link(db, client_in.user_id)
+
     client = Client(
         name=client_in.name,
         contact_person=client_in.contact_person,
         email=client_in.email,
         phone=client_in.phone,
+        inn=client_in.inn,
         user_id=client_in.user_id,
     )
     db.add(client)
-    db.commit()
-    db.refresh(client)
+
+    try:
+        db.commit()
+        db.refresh(client)
+    except IntegrityError as exc:
+        db.rollback()
+        error_text = str(exc.orig).lower()
+        if "unique" in error_text and "user_id" in error_text:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Этот пользователь уже привязан к другому клиенту",
+            )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ошибка целостности данных при создании клиента",
+        )
+    except DataError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Некорректные данные клиента. Проверьте формат полей",
+        )
+
     return client
 
 
@@ -90,12 +149,37 @@ def update_client(
         )
 
     update_data = client_in.model_dump(exclude_unset=True)
+
+    if "user_id" in update_data:
+        _validate_client_user_link(db, update_data["user_id"], current_client_id=client_id)
+
     for field, value in update_data.items():
         setattr(client, field, value)
 
     db.add(client)
-    db.commit()
-    db.refresh(client)
+
+    try:
+        db.commit()
+        db.refresh(client)
+    except IntegrityError as exc:
+        db.rollback()
+        error_text = str(exc.orig).lower()
+        if "unique" in error_text and "user_id" in error_text:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Этот пользователь уже привязан к другому клиенту",
+            )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ошибка целостности данных при обновлении клиента",
+        )
+    except DataError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Некорректные данные клиента. Проверьте формат полей",
+        )
+
     return client
 
 

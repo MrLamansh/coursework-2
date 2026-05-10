@@ -23,7 +23,7 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
-    user = db.query(User).filter(User.username == form_data.username).first()
+    user = db.query(User).filter(User.username == form_data.username, User.is_deleted.is_(False)).first()
 
     if user is None or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(

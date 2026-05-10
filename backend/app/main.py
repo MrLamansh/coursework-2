@@ -1,8 +1,11 @@
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.background import BackgroundScheduler
+
+logger = logging.getLogger(__name__)
 
 from app.api.health import router as health_router
 from app.api.users import router as users_router
@@ -43,13 +46,13 @@ async def lifespan(app: FastAPI):
         replace_existing=True
     )
     scheduler.start()
-    print("Планировщик запущен. Проверка доменов каждый день в 03:00")
+    logger.info("Планировщик запущен. Проверка доменов каждый день в 03:00")
 
     yield  # Приложение работает
 
     # Останавливаем при выключении
     scheduler.shutdown()
-    print("Планировщик остановлен")
+    logger.info("Планировщик остановлен")
 
 
 app = FastAPI(

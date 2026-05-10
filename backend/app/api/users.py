@@ -17,7 +17,7 @@ def get_users(
     db: Session = Depends(get_db),
     _: User = Depends(require_role("manager")),  # только менеджер видит всех юзеров
 ):
-    return db.query(User).order_by(User.id).offset(skip).limit(limit).all()
+    return db.query(User).filter(User.is_deleted.is_(False)).order_by(User.id).offset(skip).limit(limit).all()
 
 
 @router.get("/{user_id}", response_model=UserRead)
@@ -26,7 +26,7 @@ def get_user_by_id(
     db: Session = Depends(get_db),
     _: User = Depends(require_role("manager")),
 ):
-    user = db.query(User).filter(User.id == user_id).first()
+    user = db.query(User).filter(User.id == user_id, User.is_deleted.is_(False)).first()
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     return user
@@ -38,7 +38,7 @@ def create_user(
     db: Session = Depends(get_db),
     _: User = Depends(require_role("manager")),  # только менеджер создаёт пользователей
 ):
-    if db.query(User).filter(User.username == user_in.username).first():
+    if db.query(User).filter(User.username == user_in.username, User.is_deleted.is_(False)).first():
         raise HTTPException(status_code=400, detail="Пользователь с таким именем уже существует")
 
     new_user = User(
@@ -60,7 +60,7 @@ def update_user(
     db: Session = Depends(get_db),
     _: User = Depends(require_role("manager")),
 ):
-    user = db.query(User).filter(User.id == user_id).first()
+    user = db.query(User).filter(User.id == user_id, User.is_deleted.is_(False)).first()
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
 
@@ -79,10 +79,10 @@ def delete_user(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("manager")),
 ):
-    user = db.query(User).filter(User.id == user_id).first()
+    user = db.query(User).filter(User.id == user_id, User.is_deleted.is_(False)).first()
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     if user.id == current_user.id:
         raise HTTPException(status_code=400, detail="Нельзя удалить самого себя")
-    db.delete(user)
+    user.is_deleted = True
     db.commit()
