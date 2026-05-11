@@ -5,6 +5,7 @@ import csv
 import io
 from datetime import datetime, timedelta
 from typing import Optional
+from urllib.parse import quote
 
 from app.db.session import get_db
 from app.models.domain import Domain
@@ -125,7 +126,7 @@ def _get_client_payments_data(db: Session, client_id: int) -> list[dict]:
 
 
 def _generate_csv(rows: list[dict], filename: str) -> StreamingResponse:
-    """Generate CSV response with UTF-8 BOM encoding."""
+    """Generate CSV response with proper UTF-8 encoding and BOM."""
     output = io.BytesIO()
 
     if not rows:
@@ -134,7 +135,7 @@ def _generate_csv(rows: list[dict], filename: str) -> StreamingResponse:
     else:
         fieldnames = list(rows[0].keys())
 
-    # Пишем в BytesIO с utf-8-sig (BOM добавляется автоматически)
+    # Пишем в BytesIO с utf-8-sig (BOM добавляется автоматически для Excel)
     text = io.TextIOWrapper(output, encoding='utf-8-sig', newline='')
     writer = csv.DictWriter(text, fieldnames=fieldnames, delimiter=";")
     writer.writeheader()
@@ -145,8 +146,11 @@ def _generate_csv(rows: list[dict], filename: str) -> StreamingResponse:
     text.detach()
     output.seek(0)
 
+    # RFC 5987 encoding для заголовка с Unicode символами
+    encoded_filename = quote(filename, safe='')
+
     headers = {
-        "Content-Disposition": f'attachment; filename="{filename}"',
+        "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}",
     }
     return StreamingResponse(
         output,

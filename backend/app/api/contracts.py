@@ -10,6 +10,7 @@ from app.db.session import get_db
 from app.models.client import Client
 from app.models.contract import Contract
 from app.models.directories import ContractStatus
+from app.models.domain import Domain
 from app.models.user import User
 from app.schemas.contract import ContractCreate, ContractRead, ContractUpdate
 
@@ -170,7 +171,20 @@ def delete_contract(contract_id: int, db: Session = Depends(get_db)):
     if not contract or contract.is_deleted:
         raise HTTPException(status_code=404, detail="Контракт не найден")
 
+    now = datetime.now(UTC)
     contract.is_deleted = True
-    contract.updated_at = datetime.now(UTC)
+    contract.updated_at = now
+
+    db.query(Domain).filter(
+        Domain.contract_id == contract.id,
+        Domain.is_deleted.is_(False),
+    ).update(
+        {
+            Domain.is_deleted: True,
+            Domain.updated_at: now,
+        },
+        synchronize_session=False,
+    )
+
     db.commit()
     return None

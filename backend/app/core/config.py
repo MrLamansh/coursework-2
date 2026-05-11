@@ -17,7 +17,11 @@ class Settings(BaseSettings):
     SMTP_USER: str | None = None
     SMTP_PASSWORD: str | None = None
     SMTP_FROM: str | None = None
+
     SMTP_USE_TLS: bool = True
+    SMTP_USE_SSL: bool = False
+
+    SMTP_TIMEOUT: int = 10
 
     model_config = SettingsConfigDict(
         env_file=".env",

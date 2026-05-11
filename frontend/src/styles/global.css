@@ -25,17 +25,22 @@ a {
   background: #1f2937;
   color: white;
   padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100vh;
 }
 
 .sidebar-logo {
   font-size: 22px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
 }
 
 .sidebar-nav a {
@@ -58,16 +63,16 @@ a {
 
 .header {
   background: white;
-  padding: 20px 24px;
+  padding: 16px 24px;
   border-bottom: 1px solid #e5e7eb;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
 }
 
-.header-title {
-  font-size: 24px;
-  margin-bottom: 4px;
+.header-user-info {
+  display: flex;
+  align-items: center;
 }
 
 .header-subtitle {
@@ -79,13 +84,16 @@ a {
   padding: 24px;
 }
 
-.logout-button {
+.sidebar-logout-button {
   background: #dc2626;
   color: white;
   border: none;
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
+  width: 100%;
+  font-size: 14px;
+  margin-top: auto;
 }
 
 .login-page {

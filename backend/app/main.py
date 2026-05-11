@@ -21,7 +21,7 @@ from app.api.reports import router as reports_router
 
 from app.core.config import settings
 from app.db.session import SessionLocal
-from app.services.domain_scheduler import run_daily_check
+from app.services.domain_scheduler import run_daily_check, sync_all_domain_statuses
 
 
 def scheduled_domain_check():
@@ -35,6 +35,15 @@ def scheduled_domain_check():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # При старте выравниваем уже существующие статусы доменов по expiration_date.
+    startup_db = SessionLocal()
+    try:
+        sync_all_domain_statuses(startup_db)
+    except Exception as exc:
+        logger.error(f"Не удалось синхронизировать статусы доменов при старте: {exc}")
+    finally:
+        startup_db.close()
+
     # Запускаем планировщик при старте приложения
     scheduler = BackgroundScheduler()
     scheduler.add_job(

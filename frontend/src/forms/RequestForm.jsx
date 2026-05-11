@@ -29,6 +29,8 @@ function RequestForm({
   clientOptions = [],
   contractOptions = [],
   domainOptions = [],
+  engineerOptions = [],
+  mode = "all", // "all" для менеджера, "client" для клиента
 }) {
   const [formData, setFormData] = useState({
 	request_type_id: "",
@@ -264,21 +266,33 @@ function RequestForm({
   const handleSubmit = (event) => {
 	event.preventDefault();
 
-	onSubmit({
-	  request_type_id: Number(formData.request_type_id),
-	  execution_status_id: Number(formData.execution_status_id),
-	  client_id: Number(formData.client_id),
-	  contract_id: normalizeNullableInt(formData.contract_id),
-	  domain_id: normalizeNullableInt(formData.domain_id),
-	  assigned_engineer_id: normalizeNullableInt(formData.assigned_engineer_id),
-	  description: formData.description.trim() || null,
-	});
+	// Для клиента отправляем только релевантные поля
+	if (mode === "client") {
+	  onSubmit({
+		request_type_id: Number(formData.request_type_id),
+		domain_id: normalizeNullableInt(formData.domain_id),
+		description: formData.description.trim() || null,
+		// execution_status_id, client_id, contract_id, assigned_engineer_id игнорируются на фронте
+		// и переквалифицируются на сервере
+	  });
+	} else {
+	  onSubmit({
+		request_type_id: Number(formData.request_type_id),
+		execution_status_id: Number(formData.execution_status_id),
+		client_id: Number(formData.client_id),
+		contract_id: normalizeNullableInt(formData.contract_id),
+		domain_id: normalizeNullableInt(formData.domain_id),
+		assigned_engineer_id: normalizeNullableInt(formData.assigned_engineer_id),
+		description: formData.description.trim() || null,
+	  });
+	}
   };
 
   const hasRequestTypeOptions = requestTypeOptions.length > 0;
   const hasRequestStatusOptions = requestStatusOptions.length > 0;
   const hasClientOptions = clientOptions.length > 0;
   const hasDomainOptions = domainOptions.length > 0;
+  const hasEngineerOptions = engineerOptions.length > 0;
   const contractSelectDisabled =
 	!selectedClientId || contractsLoading || visibleContracts.length === 0;
   const contractSelectPlaceholder = !selectedClientId
@@ -342,7 +356,8 @@ function RequestForm({
 			name="execution_status_id"
 			value={formData.execution_status_id}
 			onChange={handleChange}
-			required
+			required={mode !== "client"}
+			disabled={mode === "client"}
 			style={inputStyle}
 		  >
 			<option value="">Выберите статус</option>
@@ -359,7 +374,8 @@ function RequestForm({
 			placeholder="ID статуса выполнения"
 			value={formData.execution_status_id}
 			onChange={handleChange}
-			required
+			required={mode !== "client"}
+			disabled={mode === "client"}
 			min="1"
 			style={inputStyle}
 		  />
@@ -373,7 +389,8 @@ function RequestForm({
 			name="client_id"
 			value={formData.client_id}
 			onChange={handleChange}
-			required
+			required={mode !== "client"}
+			disabled={mode === "client"}
 			style={inputStyle}
 		  >
 			<option value="">Выберите клиента</option>
@@ -390,7 +407,8 @@ function RequestForm({
 			placeholder="ID клиента"
 			value={formData.client_id}
 			onChange={handleChange}
-			required
+			required={mode !== "client"}
+			disabled={mode === "client"}
 			min="1"
 			style={inputStyle}
 		  />
@@ -399,21 +417,21 @@ function RequestForm({
 
 	  <label style={labelStyle}>
 		Договор
-		  <select
-			name="contract_id"
-			value={formData.contract_id}
-			onChange={handleChange}
-			required
-			disabled={contractSelectDisabled}
-			style={inputStyle}
-		  >
-			<option value="">{contractSelectPlaceholder}</option>
-			{visibleContracts.map((contract) => (
-			  <option key={contract.id} value={contract.id}>
-				{contract.contact_number || `Договор #${contract.id}`}
-			  </option>
-			))}
-		  </select>
+		<select
+		  name="contract_id"
+		  value={formData.contract_id}
+		  onChange={handleChange}
+		  required={mode !== "client"}
+		  disabled={contractSelectDisabled || mode === "client"}
+		  style={inputStyle}
+		>
+		  <option value="">{contractSelectPlaceholder}</option>
+		  {visibleContracts.map((contract) => (
+			<option key={contract.id} value={contract.id}>
+			  {contract.contact_number || `Договор #${contract.id}`}
+			</option>
+		  ))}
+		</select>
 	  </label>
 
 	  <label style={labelStyle}>
@@ -448,15 +466,42 @@ function RequestForm({
 
 	  <label style={labelStyle}>
 		Назначенный инженер
-		<input
-		  type="number"
-		  name="assigned_engineer_id"
-		  placeholder="ID инженера (необязательно)"
-		  value={formData.assigned_engineer_id}
-		  onChange={handleChange}
-		  min="1"
-		  style={inputStyle}
-		/>
+		{mode === "client" ? (
+		  <input
+			type="number"
+			name="assigned_engineer_id"
+			placeholder="ID инженера (необязательно)"
+			value={formData.assigned_engineer_id}
+			onChange={handleChange}
+			disabled
+			min="1"
+			style={inputStyle}
+		  />
+		) : hasEngineerOptions ? (
+		  <select
+			name="assigned_engineer_id"
+			value={formData.assigned_engineer_id}
+			onChange={handleChange}
+			style={inputStyle}
+		  >
+			<option value="">Выберите инженера (необязательно)</option>
+			{engineerOptions.map((engineer) => (
+			  <option key={engineer.id} value={engineer.id}>
+				{engineer.username || `Инженер #${engineer.id}`}
+			  </option>
+			))}
+		  </select>
+		) : (
+		  <input
+			type="number"
+			name="assigned_engineer_id"
+			placeholder="ID инженера (необязательно)"
+			value={formData.assigned_engineer_id}
+			onChange={handleChange}
+			min="1"
+			style={inputStyle}
+		  />
+		)}
 	  </label>
 
 	  <label style={labelStyle}>

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { getDomains } from "../api/domains";
 
 const toDatetimeLocalValue = (value) => {
   if (!value) {
@@ -26,6 +27,15 @@ const toOptionLabel = (item, fallbackPrefix) => {
   return item.name || `${fallbackPrefix} #${item.id}`;
 };
 
+const normalizeNullableInt = (value) => {
+  if (value === "" || value === null || value === undefined) {
+	return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
 function PaymentForm({
   onSubmit,
   onCancel,
@@ -44,6 +54,8 @@ function PaymentForm({
 	contract_id: "",
 	domain_id: "",
   });
+  const [availableDomains, setAvailableDomains] = useState(null);
+  const [domainsLoading, setDomainsLoading] = useState(false);
 
   useEffect(() => {
 	if (initialData) {
@@ -67,8 +79,100 @@ function PaymentForm({
 	}
   }, [initialData]);
 
+  const selectedContractId = normalizeNullableInt(formData.contract_id);
+
+  const fallbackDomainsForContract = useMemo(() => {
+	if (!selectedContractId) {
+	  return [];
+	}
+
+	return domainOptions.filter(
+	  (domain) => String(domain.contract_id) === String(selectedContractId)
+	);
+  }, [domainOptions, selectedContractId]);
+
+  const visibleDomains =
+	selectedContractId ? availableDomains ?? fallbackDomainsForContract : [];
+
+  useEffect(() => {
+	let isActive = true;
+
+	if (!selectedContractId) {
+	  setAvailableDomains([]);
+	  setDomainsLoading(false);
+	  setFormData((prev) =>
+		prev.domain_id ? { ...prev, domain_id: "" } : prev
+	  );
+	  return () => {
+		isActive = false;
+	  };
+	}
+
+	const loadDomains = async () => {
+	  setDomainsLoading(true);
+
+	  try {
+		const domains = await getDomains(selectedContractId);
+		if (!isActive) {
+		  return;
+		}
+
+		const normalizedDomains = Array.isArray(domains) ? domains : [];
+		setAvailableDomains(normalizedDomains);
+		setFormData((prev) => {
+		  if (!prev.domain_id) {
+			return prev;
+		  }
+
+		  const hasSelectedDomain = normalizedDomains.some(
+			(domain) => String(domain.id) === String(prev.domain_id)
+		  );
+
+		  return hasSelectedDomain ? prev : { ...prev, domain_id: "" };
+		});
+	  } catch (error) {
+		if (!isActive) {
+		  return;
+		}
+
+		setAvailableDomains(fallbackDomainsForContract);
+		setFormData((prev) => {
+		  if (!prev.domain_id) {
+			return prev;
+		  }
+
+		  const hasSelectedDomain = fallbackDomainsForContract.some(
+			(domain) => String(domain.id) === String(prev.domain_id)
+		  );
+
+		  return hasSelectedDomain ? prev : { ...prev, domain_id: "" };
+		});
+	  } finally {
+		if (isActive) {
+		  setDomainsLoading(false);
+		}
+	  }
+	};
+
+	loadDomains();
+
+	return () => {
+	  isActive = false;
+	};
+  }, [fallbackDomainsForContract, selectedContractId]);
+
   const handleChange = (event) => {
 	const { name, value } = event.target;
+
+	if (name === "contract_id") {
+	  setFormData((prev) => ({
+		...prev,
+		contract_id: value,
+		domain_id: "",
+	  }));
+	  setAvailableDomains(null);
+	  return;
+	}
 
 	setFormData((prev) => ({
 	  ...prev,
@@ -87,14 +191,23 @@ function PaymentForm({
 	  payment_type_id: Number(formData.payment_type_id),
 	  payment_status_id: Number(formData.payment_status_id),
 	  contract_id: Number(formData.contract_id),
-	  domain_id: formData.domain_id ? Number(formData.domain_id) : null,
+	  domain_id: normalizeNullableInt(formData.domain_id),
 	});
   };
 
   const hasContractOptions = contractOptions.length > 0;
-  const hasDomainOptions = domainOptions.length > 0;
+  const hasDomainOptions = visibleDomains.length > 0;
   const hasPaymentTypeOptions = paymentTypeOptions.length > 0;
   const hasPaymentStatusOptions = paymentStatusOptions.length > 0;
+  const domainSelectDisabled =
+	!selectedContractId || domainsLoading || visibleDomains.length === 0;
+  const domainSelectPlaceholder = !selectedContractId
+	? "Сначала выберите договор"
+	: domainsLoading
+	? "Загружаем домены..."
+	: visibleDomains.length === 0
+	? "У договора нет доменов"
+	: "Выберите домен (необязательно)";
 
   return (
 	<form onSubmit={handleSubmit} style={formStyle}>
@@ -229,10 +342,11 @@ function PaymentForm({
 			name="domain_id"
 			value={formData.domain_id}
 			onChange={handleChange}
+			disabled={domainSelectDisabled}
 			style={inputStyle}
 		  >
-			<option value="">Без домена</option>
-			{domainOptions.map((domain) => (
+			<option value="">{domainSelectPlaceholder}</option>
+			{visibleDomains.map((domain) => (
 			  <option key={domain.id} value={domain.id}>
 				{domain.domain_name || `Домен #${domain.id}`}
 			  </option>

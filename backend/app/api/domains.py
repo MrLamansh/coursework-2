@@ -15,7 +15,11 @@ from app.models.user import User
 from app.models.client import Client
 from app.schemas.domain import DomainCreate, DomainRead, DomainUpdate
 from app.services.domain_checker import check_whois
-from app.services.domain_scheduler import run_daily_check, _sync_domain_status
+from app.services.domain_scheduler import (
+    run_daily_check,
+    sync_all_domain_statuses,
+    _sync_domain_status,
+)
 
 router = APIRouter(prefix="/domains", tags=["Domains"])
 
@@ -30,7 +34,7 @@ def get_my_domains(
     current_user: User = Depends(get_current_user),
 ):
     """Возвращает домены текущего клиента."""
-    client = db.query(Client).filter(Client.user_id == current_user.id).first()
+    client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
     if not client:
         return []
 
@@ -72,7 +76,7 @@ def list_domains(
 
     # Если клиент, показать только домены своего клиента
     if current_user.role == "client":
-        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client:
             return []
         query = query.filter(Domain.contract.has(Contract.client_id == client.id))
@@ -94,7 +98,8 @@ def get_expiring_domains(
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user),
 ):
-    threshold = datetime.now() + timedelta(days=days)
+    now = datetime.now()
+    threshold = now + timedelta(days=days)
     query = (
         db.query(Domain)
         .options(
@@ -104,13 +109,14 @@ def get_expiring_domains(
         )
         .filter(
             Domain.is_deleted.is_(False),
+            Domain.expiration_date >= now,
             Domain.expiration_date <= threshold,
         )
     )
 
     # Если клиент, показать только домены своего клиента
     if current_user.role == "client":
-        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client:
             return []
         query = query.filter(Domain.contract.has(Contract.client_id == client.id))
@@ -147,7 +153,7 @@ def get_domain(
 
     # Если клиент, проверить что это его домен
     if current_user.role == "client":
-        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client or domain.contract.client_id != client.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -171,6 +177,8 @@ def create_domain(
     db.add(domain)
 
     try:
+        db.flush()
+        _sync_domain_status(cast(Any, domain), db)
         db.commit()
         db.refresh(domain)
     except IntegrityError as e:
@@ -231,6 +239,8 @@ def update_domain(
     for field, value in update_data.items():
         setattr(domain, field, value)
 
+    domain.updated_at = datetime.now()
+
     try:
         # Синхронизируем статус домена на основе expiration_date (если обновляли дату)
         try:
@@ -269,6 +279,7 @@ def delete_domain(
         )
 
     domain.is_deleted = True
+    domain.updated_at = datetime.now()
     db.add(domain)
     db.commit()
     return None
@@ -293,7 +304,7 @@ def whois_check(
 
     # Если клиент, проверить что это его домен
     if current_user.role == "client":
-        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client or domain.contract.client_id != client.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -404,3 +415,18 @@ def trigger_check(db: Session = Depends(get_db)):
     """Ручной запуск ночной проверки доменов (для тестирования)."""
     run_daily_check(db)
     return {"status": "ok", "message": "Проверка выполнена, смотри логи и таблицу requests"}
+
+
+@router.post(
+    "/trigger-sync-statuses",
+    tags=["Debug"],
+    dependencies=[Depends(require_role("manager", "engineer"))],
+)
+def trigger_sync_statuses(db: Session = Depends(get_db)):
+    """Ручная синхронизация статусов доменов по expiration_date без создания заявок."""
+    updated_count = sync_all_domain_statuses(db)
+    return {
+        "status": "ok",
+        "message": "Статусы доменов синхронизированы",
+        "updated_count": updated_count,
+    }

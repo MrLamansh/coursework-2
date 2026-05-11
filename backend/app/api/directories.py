@@ -13,7 +13,9 @@ from app.schemas.directories import DirectoryRead, RegistrarRead
 router = APIRouter(prefix="/directories", tags=["Directories"])
 
 
-common_dep = [Depends(require_role("manager", "engineer"))]
+# Доступ к справочникам: менеджеры и инженеры, а также клиенты для чтения
+# (фронтенд запрашивает справочники для отображения меток на страницах клиентов)
+common_dep = [Depends(require_role("manager", "engineer", "client"))]
 
 
 @router.get("/domain-statuses", response_model=list[DirectoryRead], dependencies=common_dep)

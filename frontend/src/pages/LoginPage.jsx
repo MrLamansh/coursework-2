@@ -17,7 +17,7 @@ function LoginPage() {
   const { login, isAuthenticated } = auth;
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/" replace />;
   }
 
   const handleSubmit = async (event) => {

@@ -40,7 +40,7 @@ const getStatusLabel = (status) => {
 function PaymentsPage() {
   const auth = useAuth();
   const role = auth?.user?.role || "manager";
-  const canManage = role === "manager" || role === "engineer";
+  const canManage = role === "manager";
   const [payments, setPayments] = useState([]);
   const [contracts, setContracts] = useState([]);
   const [domains, setDomains] = useState([]);
@@ -484,3 +484,4 @@ const cellStyle = {
 };
 
 export default PaymentsPage;
+

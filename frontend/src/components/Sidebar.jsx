@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function Sidebar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const role = user?.role;
 
   return (
@@ -10,11 +10,10 @@ function Sidebar() {
       <h2 className="sidebar-logo">Domain Manager</h2>
 
       <nav className="sidebar-nav">
-        <NavLink to="/dashboard">Дашборд</NavLink>
-
         {/* Меню для всех ролей */}
         {role === "client" && (
           <>
+            <NavLink to="/dashboard">Дашборд</NavLink>
             <NavLink to="/my-domains">Мои домены</NavLink>
             <NavLink to="/my-payments">Мои платежи</NavLink>
             <NavLink to="/my-requests">Мои заявки</NavLink>
@@ -24,6 +23,7 @@ function Sidebar() {
         {/* Меню для manager */}
         {role === "manager" && (
           <>
+            <NavLink to="/dashboard">Дашборд</NavLink>
             <NavLink to="/clients">Клиенты</NavLink>
             <NavLink to="/domains">Домены</NavLink>
             <NavLink to="/requests">Заявки</NavLink>
@@ -42,6 +42,10 @@ function Sidebar() {
           </>
         )}
       </nav>
+
+      <button className="sidebar-logout-button" onClick={logout}>
+        Выйти
+      </button>
     </aside>
   );
 }

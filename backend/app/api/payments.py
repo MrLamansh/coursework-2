@@ -30,7 +30,7 @@ def get_my_payments(
     current_user: User = Depends(get_current_user),
 ):
     """Возвращает платежи по договорам текущего клиента."""
-    client = db.query(Client).filter(Client.user_id == current_user.id).first()
+    client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
     if not client:
         return []
 
@@ -59,7 +59,7 @@ def get_payments(
 
     # Если клиент, показать только платежи своих договоров
     if current_user.role == "client":
-        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client:
             return []
         query = query.join(Contract).filter(Contract.client_id == client.id)
@@ -88,7 +88,7 @@ def get_payment(
 
     # Если клиент, проверить что это его платёж
     if current_user.role == "client":
-        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         contract = db.query(Contract).filter(Contract.id == payment.contract_id).first()
         if not client or not contract or contract.client_id != client.id:
             raise HTTPException(

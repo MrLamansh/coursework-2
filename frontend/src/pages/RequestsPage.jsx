@@ -13,6 +13,7 @@ import {
   getRequestStatuses,
   getRequestTypes,
 } from "../api/directories";
+import { getUsers } from "../api/users";
 import RequestForm from "../forms/RequestForm";
 
 const formatDateTime = (value) => {
@@ -52,6 +53,8 @@ function RequestsPage() {
   const [requestStatuses, setRequestStatuses] = useState([]);
   const [requestTypes, setRequestTypes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [engineers, setEngineers] = useState([]);
   const [formLoading, setFormLoading] = useState(false);
   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
   const [error, setError] = useState("");
@@ -74,10 +77,18 @@ function RequestsPage() {
         getDomains(),
         getRequestStatuses(),
         getRequestTypes(),
+        getUsers(),
       ]);
 
-      const [requestsResult, clientsResult, contractsResult, domainsResult, statusesResult, typesResult] =
-        results;
+      const [
+        requestsResult,
+        clientsResult,
+        contractsResult,
+        domainsResult,
+        statusesResult,
+        typesResult,
+        usersResult,
+      ] = results;
 
       if (requestsResult.status === "rejected") {
         const requestsError = requestsResult.reason;
@@ -132,6 +143,19 @@ function RequestsPage() {
         );
       }
 
+      if (usersResult?.status === "fulfilled") {
+        setUsers(usersResult.value);
+        setEngineers(
+          Array.isArray(usersResult.value)
+            ? usersResult.value.filter((u) => u.role === "engineer")
+            : []
+        );
+      } else {
+        setUsers([]);
+        setEngineers([]);
+        warnings.push("Не удалось загрузить пользователей, инженеры будут показаны по ID.");
+      }
+
       setLookupWarning(warnings.join(" "));
     } catch (err) {
       console.error(err);
@@ -158,6 +182,11 @@ function RequestsPage() {
   const domainById = useMemo(
     () => new Map(domains.map((domain) => [String(domain.id), domain])),
     [domains]
+  );
+
+  const userById = useMemo(
+    () => new Map(users.map((u) => [String(u.id), u])),
+    [users]
   );
 
   const requestStatusById = useMemo(
@@ -268,7 +297,7 @@ function RequestsPage() {
         contractLabel,
         domainLabel,
         request.description,
-        request.assigned_engineer_id,
+        userById.get(String(request.assigned_engineer_id))?.username || request.assigned_engineer_id,
       ]
         .join(" ")
         .toLowerCase()
@@ -304,7 +333,10 @@ function RequestsPage() {
             Добавить заявку
           </button>
         ) : (
-          <span style={readOnlyHintStyle}>Режим просмотра</span>
+          // Показываем подсказку "Режим просмотра" только клиентам, инженерам она не нужна
+          role === "client" ? (
+            <span style={readOnlyHintStyle}>Режим просмотра</span>
+          ) : null
         )}
       </div>
 
@@ -319,6 +351,7 @@ function RequestsPage() {
           clientOptions={clients}
           contractOptions={contracts}
           domainOptions={domains}
+          engineerOptions={engineers}
         />
       )}
 
@@ -401,7 +434,7 @@ function RequestsPage() {
                   <td style={cellStyle}>{contractLabel}</td>
                   <td style={cellStyle}>{domainLabel}</td>
                   <td style={cellStyle}>
-                    {request.assigned_engineer_id || "—"}
+                    {userById.get(String(request.assigned_engineer_id))?.username || "—"}
                   </td>
                   <td style={cellStyle} title={request.description || ""}>
                     {request.description || "—"}

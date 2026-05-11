@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { getMyRequests } from "../api/requests";
+import { getMyRequests, createRequest } from "../api/requests";
 import { getRequestStatuses, getRequestTypes } from "../api/directories";
+import RequestForm from "../forms/RequestForm";
 
 const formatDateTime = (value) => {
   if (!value) {
@@ -23,6 +24,8 @@ function MyRequestsPage() {
   const [requestStatuses, setRequestStatuses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [showForm, setShowForm] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
 
   const requestTypeById = useMemo(() => {
     const map = new Map();
@@ -78,6 +81,32 @@ function MyRequestsPage() {
     loadRequests();
   }, []);
 
+  const handleCreateClick = () => {
+    setShowForm(true);
+  };
+
+  const handleCancelForm = () => {
+    setShowForm(false);
+  };
+
+  const handleSubmitForm = async (formData) => {
+    try {
+      setFormLoading(true);
+      setError("");
+      await createRequest(formData);
+      setShowForm(false);
+      await loadRequests();
+    } catch (err) {
+      console.error(err);
+      setError(
+        err?.response?.data?.detail ||
+          "Не удалось создать заявку. Проверьте все обязательные поля."
+      );
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   const normalizedSearch = searchTerm.trim().toLowerCase();
 
   const filteredRequests = useMemo(() => {
@@ -127,9 +156,25 @@ function MyRequestsPage() {
     <div>
       <div style={headerRowStyle}>
         <h2>Мои заявки</h2>
+        <button
+          onClick={handleCreateClick}
+          style={addButtonStyle}
+        >
+          Добавить заявку
+        </button>
       </div>
 
       {error && <p style={errorStyle}>{error}</p>}
+
+      {showForm && (
+        <RequestForm
+          onSubmit={handleSubmitForm}
+          onCancel={handleCancelForm}
+          loading={formLoading}
+          requestTypeOptions={requestTypes}
+          mode="client"
+        />
+      )}
 
       <div style={filtersStyle}>
         <input
@@ -230,6 +275,15 @@ const inputStyle = {
 const errorStyle = {
   color: "red",
   marginBottom: "16px",
+};
+
+const addButtonStyle = {
+  background: "#16a34a",
+  color: "#fff",
+  border: "none",
+  padding: "10px 16px",
+  borderRadius: "8px",
+  cursor: "pointer",
 };
 
 const tableStyle = {

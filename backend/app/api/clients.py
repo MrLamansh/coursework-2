@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.orm import Session
@@ -5,6 +7,8 @@ from sqlalchemy.orm import Session
 from app.core.deps import require_role
 from app.db.session import get_db
 from app.models.client import Client
+from app.models.contract import Contract
+from app.models.domain import Domain
 from app.models.user import User
 from app.schemas.client import ClientCreate, ClientRead, ClientUpdate
 
@@ -199,7 +203,46 @@ def delete_client(
             detail="Client not found",
         )
 
+    now = datetime.now()
     client.is_deleted = True
+
+    # Собираем все договоры клиента для каскада на домены
+    all_contract_ids = [
+        contract_id
+        for (contract_id,) in db.query(Contract.id)
+        .filter(Contract.client_id == client.id)
+        .all()
+    ]
+
+    # Каскадно помечаем активные договоры клиента как удалённые
+    active_contract_ids = [
+        contract_id
+        for (contract_id,) in db.query(Contract.id)
+        .filter(Contract.client_id == client.id, Contract.is_deleted.is_(False))
+        .all()
+    ]
+    if active_contract_ids:
+        db.query(Contract).filter(Contract.id.in_(active_contract_ids)).update(
+            {
+                Contract.is_deleted: True,
+                Contract.updated_at: now,
+            },
+            synchronize_session=False,
+        )
+
+    if all_contract_ids:
+        # Каскадно помечаем домены договоров клиента как удалённые
+        db.query(Domain).filter(
+            Domain.contract_id.in_(all_contract_ids),
+            Domain.is_deleted.is_(False),
+        ).update(
+            {
+                Domain.is_deleted: True,
+                Domain.updated_at: now,
+            },
+            synchronize_session=False,
+        )
+
     db.add(client)
     db.commit()
     return None

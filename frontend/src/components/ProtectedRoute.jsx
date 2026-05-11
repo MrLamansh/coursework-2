@@ -10,7 +10,7 @@ function ProtectedRoute({ children, allowedRoles }) {
 
   // Если allowedRoles указан, проверяем роль пользователя
   if (allowedRoles && !allowedRoles.includes(user?.role)) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

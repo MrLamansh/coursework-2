@@ -90,7 +90,7 @@ def get_request_by_id(
 
     if current_user.role == "client":
         # Разрешаем клиенту смотреть только свои заявки
-        client = db.query(Client).filter(Client.user_id == current_user.id).first()
+        client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client or req.client_id != client.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

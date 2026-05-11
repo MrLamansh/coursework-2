@@ -4,54 +4,38 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a65856c1-953b-465d-a0b0-fa9f03ed028c" name="Changes" comment="Почти рабочий полный фронтенд, бэкенд немного доделал">
-      <change afterPath="$PROJECT_DIR$/backend/migrations/README_INIT.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/migrations/init_directories.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/api/reports.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/api/users.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/forms/UserForm.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/MyDomainsPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/MyPaymentsPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/MyRequestsPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/ReportsPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/UsersPage.jsx" afterDir="false" />
+    <list default="true" id="a65856c1-953b-465d-a0b0-fa9f03ed028c" name="Changes" comment="Почти все готово">
+      <change afterPath="$PROJECT_DIR$/backend/migrations/versions/f4a7a2d1c901_add_assigned_engineer_to_payments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/api/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/MIGRATIONS.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/api/clients.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/clients.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/api/contracts.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/contracts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/directories.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/directories.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/api/domains.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/domains.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/api/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/events.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/api/payments.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/payments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/api/reports.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/reports.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/api/requests.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/requests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/api/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/users.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/core/deps.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/core/deps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/core/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/core/email_sender.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/core/email_sender.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/payment.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/payment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/request.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/request.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/services/domain_checker.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/domain_checker.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/services/domain_scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/domain_scheduler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/contracts.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/contracts.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/domains.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/domains.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/http.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/http.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/payments.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/payments.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/requests.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/requests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/reports.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/reports.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/Header.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Header.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Loader.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Loader.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Modal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Modal.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/ProtectedRoute.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ProtectedRoute.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/Sidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Sidebar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/StatusBadge.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/StatusBadge.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Table.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Table.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/forms/ClientForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/forms/ClientForm.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/forms/PaymentForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/forms/PaymentForm.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/forms/RequestForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/forms/RequestForm.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ClientsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ClientsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/DashboardPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/DashboardPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LoginPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LoginPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/MyRequestsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/MyRequestsPage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/PaymentsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PaymentsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/RequestsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/RequestsPage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/router.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/router.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/styles/variables.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/variables.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/utils/constants.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/constants.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/utils/formatMoney.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/formatMoney.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/styles/global.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/global.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +45,7 @@
   <component name="CopilotChats">
     <option name="panelChat">
       <chat>
-        <option name="activeSessionId" value="b27679b6-feec-40cc-a79e-b7b218e34c61" />
+        <option name="activeSessionId" value="47a2c414-ff0e-46ee-a907-60c8f7155cbe" />
         <option name="sessions">
           <session>
             <option name="chatType" value="PANEL" />
@@ -88,6 +72,22 @@
             <option name="modelValue" value="auto" />
             <option name="targetType" value="LOCAL" />
           </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="6b6b5d41-366f-4712-ad68-d80be7af1b23" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="47a2c414-ff0e-46ee-a907-60c8f7155cbe" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
         </option>
         <option name="type" value="PANEL" />
       </chat>
@@ -99,7 +99,7 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="121" />
+    <option name="cachedIndexableFilesCount" value="125" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -145,32 +145,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.hash_passwords.executor": "Run",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/koles/Desktop/my-telegram-app/coursework-2/frontend",
-    "list.type.of.created.stylesheet": "CSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "to.speed.mode.migration.done": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.hash_passwords.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/koles/Desktop/my-telegram-app/coursework-2/frontend&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\koles\Desktop\my-telegram-app\coursework-2\frontend" />
@@ -252,7 +252,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777386848698</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Почти все готово">
+      <option name="closed" value="true" />
+      <created>1778407392221</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1778407392221</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -262,7 +270,8 @@
     <MESSAGE value="Переработан весь бэк, кое-что привязано к фронту" />
     <MESSAGE value="Бэк добилил, фронт не трогал" />
     <MESSAGE value="Почти рабочий полный фронтенд, бэкенд немного доделал" />
-    <option name="LAST_COMMIT_MESSAGE" value="Почти рабочий полный фронтенд, бэкенд немного доделал" />
+    <MESSAGE value="Почти все готово" />
+    <option name="LAST_COMMIT_MESSAGE" value="Почти все готово" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

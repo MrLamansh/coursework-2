@@ -2,7 +2,6 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import LoginPage from "./pages/LoginPage";
-import DashboardPage from "./pages/DashboardPage";
 import ClientsPage from "./pages/ClientsPage";
 import DomainsPage from "./pages/DomainsPage";
 import RequestsPage from "./pages/RequestsPage";
@@ -13,6 +12,26 @@ import UsersPage from "./pages/UsersPage";
 import MyDomainsPage from "./pages/MyDomainsPage";
 import MyPaymentsPage from "./pages/MyPaymentsPage";
 import MyRequestsPage from "./pages/MyRequestsPage";
+import DashboardPage from "./pages/DashboardPage";
+import { useAuth } from "./context/AuthContext";
+
+function RoleHomeRedirect() {
+  const { user, isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role === "client") {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  if (user?.role === "engineer") {
+    return <Navigate to="/domains" replace />;
+  }
+
+  return <Navigate to="/dashboard" replace />;
+}
 
 function AppRouter() {
   return (
@@ -27,8 +46,16 @@ function AppRouter() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
+        <Route index element={<RoleHomeRedirect />} />
+
+        <Route
+          path="dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["manager", "client"]}>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Маршруты для clients */}
         <Route
@@ -115,7 +142,7 @@ function AppRouter() {
         />
       </Route>
 
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<RoleHomeRedirect />} />
     </Routes>
   );
 }

@@ -14,8 +14,12 @@ logger = logging.getLogger(__name__)
 
 
 def run_daily_check(db: Session):
-    logger.info("Запуск ночной проверки доменов...")
+    logger.info("Запуск проверки доменов...")
     now = datetime.now()
+
+    # Сначала приводим статусы всех доменов к актуальному виду,
+    # чтобы в БД не оставались просроченные домены со статусом "Активен".
+    sync_all_domain_statuses(db, now)
 
     domains = (
         db.query(Domain)
@@ -95,11 +99,42 @@ def run_daily_check(db: Session):
             created_count += 1
 
         except Exception as e:
-            logger.error(f"[SCHEDULER] ❌ Ошибка при обработке домена {domain.domain_name}: {e}")
+            logger.error(f"[SCHEDULER] Ошибка при обработке домена {domain.domain_name}: {e}")
             continue
 
     db.commit()
     logger.info(f"Проверка завершена. Создано заявок: {created_count}")
+
+
+def sync_all_domain_statuses(db: Session, now: datetime | None = None):
+    """Приводит текущий статус всех активных доменов к состоянию по expiration_date."""
+    if now is None:
+        now = datetime.now()
+
+    domains = (
+        db.query(Domain)
+        .options(joinedload(Domain.contract).joinedload(Contract.client))
+        .filter(Domain.is_deleted.is_(False))
+        .all()
+    )
+
+    updated_count = 0
+    for domain in domains:
+        try:
+            before = domain.current_status_id
+            _sync_domain_status(domain, db, now)
+            if before != domain.current_status_id:
+                updated_count += 1
+        except Exception as exc:
+            logger.error(
+                f"[SCHEDULER] Не удалось синхронизировать статус домена {domain.domain_name}: {exc}"
+            )
+
+    if updated_count:
+        db.commit()
+        logger.info(f"[SCHEDULER] Синхронизированы статусы доменов: {updated_count}")
+
+    return updated_count
 
 
 def _sync_domain_status(domain, db: Session, now: datetime | None = None):
