@@ -10,11 +10,9 @@ class Domain(Base):
     domain_name = Column(String(255), nullable=False, unique=True)
     registration_date = Column(DateTime, nullable=False)
     expiration_date = Column(DateTime, nullable=False)
-
     current_status_id = Column(Integer, ForeignKey("domain_statuses.id"), nullable=False)
     registrar_id = Column(Integer, ForeignKey("registrars.id"), nullable=False)
     contract_id = Column(Integer, ForeignKey("contracts.id"), nullable=False)
-
     is_deleted = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, nullable=False, server_default=func.now())
     updated_at = Column(DateTime, nullable=False, server_default=func.now())

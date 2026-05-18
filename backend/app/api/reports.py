@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 import csv
@@ -12,7 +12,6 @@ from app.models.domain import Domain
 from app.models.contract import Contract
 from app.models.client import Client
 from app.models.payment import Payment
-from app.models.directories import PaymentStatus, PaymentType
 from app.core.deps import require_role, get_current_user
 from app.models.user import User
 
@@ -27,7 +26,6 @@ def export_report(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("manager")),
 ):
-    """Export report in CSV format. Requires manager role."""
 
     if report_type == "domains":
         rows = _get_domains_data(db)
@@ -47,7 +45,6 @@ def export_report(
 
 
 def _get_domains_data(db: Session) -> list[dict]:
-    """Generate domains report data."""
     domains = (
         db.query(Domain)
         .filter(Domain.is_deleted.is_(False))
@@ -68,7 +65,6 @@ def _get_domains_data(db: Session) -> list[dict]:
 
 
 def _get_expiring_domains_data(db: Session, days: int) -> list[dict]:
-    """Generate expiring domains report (next N days)."""
     threshold = datetime.now() + timedelta(days=days)
 
     domains = (
@@ -97,7 +93,6 @@ def _get_expiring_domains_data(db: Session, days: int) -> list[dict]:
 
 
 def _get_client_payments_data(db: Session, client_id: int) -> list[dict]:
-    """Generate client payments report."""
     payments = (
         db.query(Payment)
         .join(Contract)
@@ -126,7 +121,6 @@ def _get_client_payments_data(db: Session, client_id: int) -> list[dict]:
 
 
 def _generate_csv(rows: list[dict], filename: str) -> StreamingResponse:
-    """Generate CSV response with proper UTF-8 encoding and BOM."""
     output = io.BytesIO()
 
     if not rows:
@@ -135,7 +129,6 @@ def _generate_csv(rows: list[dict], filename: str) -> StreamingResponse:
     else:
         fieldnames = list(rows[0].keys())
 
-    # Пишем в BytesIO с utf-8-sig (BOM добавляется автоматически для Excel)
     text = io.TextIOWrapper(output, encoding='utf-8-sig', newline='')
     writer = csv.DictWriter(text, fieldnames=fieldnames, delimiter=";")
     writer.writeheader()
@@ -146,7 +139,6 @@ def _generate_csv(rows: list[dict], filename: str) -> StreamingResponse:
     text.detach()
     output.seek(0)
 
-    # RFC 5987 encoding для заголовка с Unicode символами
     encoded_filename = quote(filename, safe='')
 
     headers = {

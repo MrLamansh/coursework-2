@@ -10,7 +10,6 @@ class ClientBase(BaseModel):
     phone: str | None = None
     inn: str | None = None
     user_id: int | None = None
-    is_deleted: bool = False
 
 
 class ClientCreate(ClientBase):

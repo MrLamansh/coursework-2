@@ -5,37 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a65856c1-953b-465d-a0b0-fa9f03ed028c" name="Changes" comment="Почти все готово">
-      <change afterPath="$PROJECT_DIR$/backend/migrations/versions/f4a7a2d1c901_add_assigned_engineer_to_payments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/MIGRATIONS.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/api/clients.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/clients.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/api/contracts.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/contracts.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/api/directories.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/directories.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/api/domains.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/domains.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/api/payments.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/payments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/api/reports.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/reports.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/api/requests.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/requests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/core/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/core/email_sender.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/core/email_sender.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/services/domain_checker.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/domain_checker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/contract.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/contract.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/domain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/domain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/event.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/event.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/payment.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/payment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/request.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/request.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/domain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/domain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/payment.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/payment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/request.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/request.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/user.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/services/domain_scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/domain_scheduler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/reports.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/reports.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Header.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Header.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/hash_passwords.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/ProtectedRoute.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ProtectedRoute.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Sidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Sidebar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/forms/PaymentForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/forms/PaymentForm.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/forms/RequestForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/forms/RequestForm.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/DashboardPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/DashboardPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LoginPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LoginPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/MyRequestsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/MyRequestsPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PaymentsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PaymentsPage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/RequestsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/RequestsPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/router.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/router.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/styles/global.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/global.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +33,7 @@
   <component name="CopilotChats">
     <option name="panelChat">
       <chat>
-        <option name="activeSessionId" value="47a2c414-ff0e-46ee-a907-60c8f7155cbe" />
+        <option name="activeSessionId" value="039fad95-e9b0-410b-bec5-f3a1525413fb" />
         <option name="sessions">
           <session>
             <option name="chatType" value="PANEL" />
@@ -83,6 +71,14 @@
           <session>
             <option name="chatType" value="PANEL" />
             <option name="id" value="47a2c414-ff0e-46ee-a907-60c8f7155cbe" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="6213cff0-8e34-4471-bde5-a0c73aef30bd" />
             <option name="modeId" value="Agent" />
             <option name="modelType" value="builtin_family" />
             <option name="modelValue" value="auto" />
@@ -134,6 +130,9 @@
     <commands />
     <urls />
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -167,6 +166,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
@@ -260,7 +260,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778407392221</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Почти все готово">
+      <option name="closed" value="true" />
+      <created>1778499125698</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1778499125698</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

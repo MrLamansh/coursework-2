@@ -107,7 +107,6 @@ def run_daily_check(db: Session):
 
 
 def sync_all_domain_statuses(db: Session, now: datetime | None = None):
-    """Приводит текущий статус всех активных доменов к состоянию по expiration_date."""
     if now is None:
         now = datetime.now()
 
@@ -138,13 +137,6 @@ def sync_all_domain_statuses(db: Session, now: datetime | None = None):
 
 
 def _sync_domain_status(domain, db: Session, now: datetime | None = None):
-    """Обновляет domain.current_status_id в соответствии с правилами по expiration_date.
-
-    Правила:
-    - expiration_date > CURRENT_DATE -> 'Активен'
-    - expiration_date < CURRENT_DATE -> 'Просрочен'
-    - expiration_date == CURRENT_DATE -> 'Истекает сегодня' (создаётся если отсутствует)
-    """
     if now is None:
         now = datetime.now()
 
@@ -159,14 +151,12 @@ def _sync_domain_status(domain, db: Session, now: datetime | None = None):
         target_name = "Истекает сегодня"
 
     status_obj = db.query(DomainStatus).filter(DomainStatus.name == target_name).first()
-    # Создаём статус только для 'Истекает сегодня', другие статусы ожидаются существующими
     if status_obj is None and target_name == "Истекает сегодня":
         status_obj = DomainStatus(name=target_name)
         db.add(status_obj)
         db.flush()
 
     if status_obj is None:
-        # Не смогли найти соответствующий статус — логируем и пропускаем
         logger.warning(f"[SCHEDULER] Статус '{target_name}' не найден в domain_statuses, пропускаем обновление статуса для {domain.domain_name}")
         return
 

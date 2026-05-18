@@ -45,6 +45,7 @@ function RequestsPage() {
   const auth = useAuth();
   const role = auth?.user?.role || "manager";
   const canManageRequests = role === "manager";
+  const showLookupWarning = role !== "engineer";
 
   const [requests, setRequests] = useState([]);
   const [clients, setClients] = useState([]);
@@ -356,7 +357,9 @@ function RequestsPage() {
       )}
 
       {error && <p style={errorStyle}>{error}</p>}
-      {lookupWarning && <p style={warningStyle}>{lookupWarning}</p>}
+      {showLookupWarning && lookupWarning && (
+        <p style={warningStyle}>{lookupWarning}</p>
+      )}
 
       <div style={filtersStyle}>
         <input

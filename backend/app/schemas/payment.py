@@ -34,7 +34,6 @@ class PaymentUpdate(BaseModel):
     payment_status_id: int | None = None
     domain_id: int | None = None
     contract_id: int | None = None
-    is_deleted: bool | None = None
 
     class Config:
         from_attributes = True

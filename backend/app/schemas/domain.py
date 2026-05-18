@@ -2,7 +2,6 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 
 
-# Вспомогательные схемы для отображения связанных данных (чтобы не было голых ID)
 class ClientMinimal(BaseModel):
     id: int
     name: str
@@ -32,7 +31,6 @@ class RegistrarMinimal(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-# Основные схемы домена
 class DomainBase(BaseModel):
     domain_name: str
     registration_date: datetime
@@ -53,7 +51,6 @@ class DomainUpdate(BaseModel):
     current_status_id: int | None = None
     registrar_id: int | None = None
     contract_id: int | None = None
-    is_deleted: bool | None = None
 
 
 class DomainRead(DomainBase):

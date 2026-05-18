@@ -126,6 +126,14 @@ def create_request(
         if not client:
             raise HTTPException(status_code=404, detail="Профиль клиента не найден")
 
+        contract = None
+        if request_in.contract_id is not None:
+            contract = db.query(Contract).filter(Contract.id == request_in.contract_id, Contract.is_deleted.is_(False)).first()
+            if not contract:
+                raise HTTPException(status_code=404, detail="Договор не найден")
+            if contract.client_id != client.id:
+                raise HTTPException(status_code=403, detail="Договор не принадлежит клиенту")
+
         # Валидация домена — клиент может выбирать только свои домены
         domain = None
         if request_in.domain_id is not None:
@@ -134,6 +142,8 @@ def create_request(
                 raise HTTPException(status_code=404, detail="Домен не найден")
             if not domain.contract or domain.contract.client_id != client.id:
                 raise HTTPException(status_code=403, detail="Домен не принадлежит клиенту")
+            if contract and domain.contract_id != contract.id:
+                raise HTTPException(status_code=400, detail="Домен не относится к выбранному договору")
 
         # execution_status = 'Новая'
         rs = db.query(RequestStatus).filter(RequestStatus.name == "Новая").first()
@@ -145,7 +155,7 @@ def create_request(
             request_type_id=request_in.request_type_id,
             execution_status_id=execution_status_id,
             client_id=client.id,
-            contract_id=(domain.contract_id if domain else None),
+            contract_id=(domain.contract_id if domain else (contract.id if contract else None)),
             domain_id=(domain.id if domain else None),
             assigned_engineer_id=None,
             description=request_in.description,

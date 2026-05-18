@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { getContracts } from "../api/contracts";
 import { getDomains } from "../api/domains";
 
+const EMPTY_OPTIONS = Object.freeze([]);
+
 const toOptionLabel = (item, fallbackPrefix) => {
   if (!item) {
 	return "";
@@ -24,14 +26,16 @@ function RequestForm({
   onCancel,
   loading,
   initialData = null,
-  requestTypeOptions = [],
-  requestStatusOptions = [],
-  clientOptions = [],
-  contractOptions = [],
-  domainOptions = [],
-  engineerOptions = [],
+  requestTypeOptions = EMPTY_OPTIONS,
+  requestStatusOptions = EMPTY_OPTIONS,
+  clientOptions = EMPTY_OPTIONS,
+  contractOptions = EMPTY_OPTIONS,
+  domainOptions = EMPTY_OPTIONS,
+  engineerOptions = EMPTY_OPTIONS,
   mode = "all", // "all" для менеджера, "client" для клиента
 }) {
+  const isClientMode = mode === "client";
+
   const [formData, setFormData] = useState({
 	request_type_id: "",
 	execution_status_id: "",
@@ -74,6 +78,10 @@ function RequestForm({
   const selectedContractId = normalizeNullableInt(formData.contract_id);
 
   const fallbackContractsForClient = useMemo(() => {
+	if (isClientMode) {
+	  return contractOptions;
+	}
+
 	if (!selectedClientId) {
 	  return [];
 	}
@@ -81,10 +89,13 @@ function RequestForm({
 	return contractOptions.filter(
 	  (contract) => String(contract.client_id) === String(selectedClientId)
 	);
-  }, [contractOptions, selectedClientId]);
+  }, [contractOptions, isClientMode, selectedClientId]);
 
-  const visibleContracts =
-	selectedClientId ? availableContracts ?? fallbackContractsForClient : [];
+  const visibleContracts = isClientMode
+  ? availableContracts ?? fallbackContractsForClient
+  : selectedClientId
+  ? availableContracts ?? fallbackContractsForClient
+  : [];
 
   const fallbackDomainsForContract = useMemo(() => {
 	if (!selectedContractId) {
@@ -102,7 +113,7 @@ function RequestForm({
   useEffect(() => {
 	let isActive = true;
 
-	if (!selectedClientId) {
+	if (!isClientMode && !selectedClientId) {
 	  setAvailableContracts([]);
 	  setContractsLoading(false);
 	  setFormData((prev) =>
@@ -117,7 +128,9 @@ function RequestForm({
 	  setContractsLoading(true);
 
 	  try {
-		const contracts = await getContracts(selectedClientId);
+		const contracts = isClientMode
+		  ? await getContracts()
+		  : await getContracts(selectedClientId);
 		if (!isActive) {
 		  return;
 		}
@@ -139,17 +152,13 @@ function RequestForm({
 		  return;
 		}
 
-		setAvailableContracts(fallbackContractsForClient);
+		setAvailableContracts([]);
 		setFormData((prev) => {
 		  if (!prev.contract_id) {
 			return prev;
 		  }
 
-		  const hasSelectedContract = fallbackContractsForClient.some(
-			(contract) => String(contract.id) === String(prev.contract_id)
-		  );
-
-		  return hasSelectedContract ? prev : { ...prev, contract_id: "" };
+		  return { ...prev, contract_id: "", domain_id: "" };
 		});
 	  } finally {
 		if (isActive) {
@@ -163,7 +172,7 @@ function RequestForm({
 	return () => {
 	  isActive = false;
 	};
-  }, [fallbackContractsForClient, selectedClientId]);
+  }, [isClientMode, selectedClientId]);
 
   useEffect(() => {
 	let isActive = true;
@@ -206,7 +215,7 @@ function RequestForm({
 		  return;
 		}
 
-		setAvailableDomains(fallbackDomainsForContract);
+					setAvailableDomains(fallbackDomainsForContract);
 		setFormData((prev) => {
 		  if (!prev.domain_id) {
 			return prev;
@@ -230,7 +239,7 @@ function RequestForm({
 	return () => {
 	  isActive = false;
 	};
-  }, [fallbackDomainsForContract, selectedContractId]);
+  }, [selectedContractId]);
 
   const handleChange = (event) => {
 	const { name, value } = event.target;
@@ -266,14 +275,14 @@ function RequestForm({
   const handleSubmit = (event) => {
 	event.preventDefault();
 
-	// Для клиента отправляем только релевантные поля
-	if (mode === "client") {
+	// Для клиента не отправляем client_id и assigned_engineer_id
+	if (isClientMode) {
 	  onSubmit({
 		request_type_id: Number(formData.request_type_id),
+		contract_id: normalizeNullableInt(formData.contract_id),
 		domain_id: normalizeNullableInt(formData.domain_id),
 		description: formData.description.trim() || null,
-		// execution_status_id, client_id, contract_id, assigned_engineer_id игнорируются на фронте
-		// и переквалифицируются на сервере
+		// client_id и assigned_engineer_id заполняются на бэкенде
 	  });
 	} else {
 	  onSubmit({
@@ -293,9 +302,16 @@ function RequestForm({
   const hasClientOptions = clientOptions.length > 0;
   const hasDomainOptions = domainOptions.length > 0;
   const hasEngineerOptions = engineerOptions.length > 0;
-  const contractSelectDisabled =
-	!selectedClientId || contractsLoading || visibleContracts.length === 0;
-  const contractSelectPlaceholder = !selectedClientId
+  const contractSelectDisabled = isClientMode
+	? contractsLoading || visibleContracts.length === 0
+	: !selectedClientId || contractsLoading || visibleContracts.length === 0;
+  const contractSelectPlaceholder = isClientMode
+	? contractsLoading
+	  ? "Загружаем договоры..."
+	  : visibleContracts.length === 0
+	  ? "Договоры не найдены"
+	  : "Выберите договор (необязательно)"
+	: !selectedClientId
 	? "Сначала выберите клиента"
 	: contractsLoading
 	? "Загружаем договоры..."
@@ -349,71 +365,71 @@ function RequestForm({
 		)}
 	  </label>
 
-	  <label style={labelStyle}>
-		Статус выполнения
-		{hasRequestStatusOptions ? (
-		  <select
-			name="execution_status_id"
-			value={formData.execution_status_id}
-			onChange={handleChange}
-			required={mode !== "client"}
-			disabled={mode === "client"}
-			style={inputStyle}
-		  >
-			<option value="">Выберите статус</option>
-			{requestStatusOptions.map((item) => (
-			  <option key={item.id} value={item.id}>
-				{toOptionLabel(item, "Статус")}
-			  </option>
-			))}
-		  </select>
-		) : (
-		  <input
-			type="number"
-			name="execution_status_id"
-			placeholder="ID статуса выполнения"
-			value={formData.execution_status_id}
-			onChange={handleChange}
-			required={mode !== "client"}
-			disabled={mode === "client"}
-			min="1"
-			style={inputStyle}
-		  />
-		)}
-	  </label>
+	  {!isClientMode && (
+		<label style={labelStyle}>
+		  Статус выполнения
+		  {hasRequestStatusOptions ? (
+			<select
+			  name="execution_status_id"
+			  value={formData.execution_status_id}
+			  onChange={handleChange}
+			  required
+			  style={inputStyle}
+			>
+			  <option value="">Выберите статус</option>
+			  {requestStatusOptions.map((item) => (
+				<option key={item.id} value={item.id}>
+				  {toOptionLabel(item, "Статус")}
+				</option>
+			  ))}
+			</select>
+		  ) : (
+			<input
+			  type="number"
+			  name="execution_status_id"
+			  placeholder="ID статуса выполнения"
+			  value={formData.execution_status_id}
+			  onChange={handleChange}
+			  required
+			  min="1"
+			  style={inputStyle}
+			/>
+		  )}
+		</label>
+	  )}
 
-	  <label style={labelStyle}>
-		Клиент
-		{hasClientOptions ? (
-		  <select
-			name="client_id"
-			value={formData.client_id}
-			onChange={handleChange}
-			required={mode !== "client"}
-			disabled={mode === "client"}
-			style={inputStyle}
-		  >
-			<option value="">Выберите клиента</option>
-			{clientOptions.map((client) => (
-			  <option key={client.id} value={client.id}>
-				{client.name || client.contact_person || `Клиент #${client.id}`}
-			  </option>
-			))}
-		  </select>
-		) : (
-		  <input
-			type="number"
-			name="client_id"
-			placeholder="ID клиента"
-			value={formData.client_id}
-			onChange={handleChange}
-			required={mode !== "client"}
-			disabled={mode === "client"}
-			min="1"
-			style={inputStyle}
-		  />
-		)}
-	  </label>
+	  {!isClientMode && (
+		<label style={labelStyle}>
+		  Клиент
+		  {hasClientOptions ? (
+			<select
+			  name="client_id"
+			  value={formData.client_id}
+			  onChange={handleChange}
+			  required
+			  style={inputStyle}
+			>
+			  <option value="">Выберите клиента</option>
+			  {clientOptions.map((client) => (
+				<option key={client.id} value={client.id}>
+				  {client.name || client.contact_person || `Клиент #${client.id}`}
+				</option>
+			  ))}
+			</select>
+		  ) : (
+			<input
+			  type="number"
+			  name="client_id"
+			  placeholder="ID клиента"
+			  value={formData.client_id}
+			  onChange={handleChange}
+			  required
+			  min="1"
+			  style={inputStyle}
+			/>
+		  )}
+		</label>
+	  )}
 
 	  <label style={labelStyle}>
 		Договор
@@ -421,8 +437,8 @@ function RequestForm({
 		  name="contract_id"
 		  value={formData.contract_id}
 		  onChange={handleChange}
-		  required={mode !== "client"}
-		  disabled={contractSelectDisabled || mode === "client"}
+		  required={!isClientMode}
+		  disabled={contractSelectDisabled}
 		  style={inputStyle}
 		>
 		  <option value="">{contractSelectPlaceholder}</option>
@@ -436,7 +452,7 @@ function RequestForm({
 
 	  <label style={labelStyle}>
 		Домен
-		{hasDomainOptions ? (
+		{isClientMode || hasDomainOptions ? (
 		  <select
 			name="domain_id"
 			value={formData.domain_id}
@@ -464,45 +480,36 @@ function RequestForm({
 		)}
 	  </label>
 
-	  <label style={labelStyle}>
-		Назначенный инженер
-		{mode === "client" ? (
-		  <input
-			type="number"
-			name="assigned_engineer_id"
-			placeholder="ID инженера (необязательно)"
-			value={formData.assigned_engineer_id}
-			onChange={handleChange}
-			disabled
-			min="1"
-			style={inputStyle}
-		  />
-		) : hasEngineerOptions ? (
-		  <select
-			name="assigned_engineer_id"
-			value={formData.assigned_engineer_id}
-			onChange={handleChange}
-			style={inputStyle}
-		  >
-			<option value="">Выберите инженера (необязательно)</option>
-			{engineerOptions.map((engineer) => (
-			  <option key={engineer.id} value={engineer.id}>
-				{engineer.username || `Инженер #${engineer.id}`}
-			  </option>
-			))}
-		  </select>
-		) : (
-		  <input
-			type="number"
-			name="assigned_engineer_id"
-			placeholder="ID инженера (необязательно)"
-			value={formData.assigned_engineer_id}
-			onChange={handleChange}
-			min="1"
-			style={inputStyle}
-		  />
-		)}
-	  </label>
+	  {!isClientMode && (
+		<label style={labelStyle}>
+		  Назначенный инженер
+		  {hasEngineerOptions ? (
+			<select
+			  name="assigned_engineer_id"
+			  value={formData.assigned_engineer_id}
+			  onChange={handleChange}
+			  style={inputStyle}
+			>
+			  <option value="">Выберите инженера (необязательно)</option>
+			  {engineerOptions.map((engineer) => (
+				<option key={engineer.id} value={engineer.id}>
+				  {engineer.username || `Инженер #${engineer.id}`}
+				</option>
+			  ))}
+			</select>
+		  ) : (
+			<input
+			  type="number"
+			  name="assigned_engineer_id"
+			  placeholder="ID инженера (необязательно)"
+			  value={formData.assigned_engineer_id}
+			  onChange={handleChange}
+			  min="1"
+			  style={inputStyle}
+			/>
+		  )}
+		</label>
+	  )}
 
 	  <label style={labelStyle}>
 		Описание

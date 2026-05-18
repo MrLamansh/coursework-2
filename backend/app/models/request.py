@@ -8,17 +8,11 @@ class Request(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     request_number = Column("request_number", String(100), nullable=False, unique=True)
-
-    # Внешние ключи на справочники
     request_type_id = Column("request_type_id", Integer, ForeignKey("request_types.id"), nullable=False)
     execution_status_id = Column("execution_status_id", Integer, ForeignKey("request_statuses.id"), nullable=False)
-
-    # Внешние ключи на сущности
     client_id = Column("client_id", Integer, ForeignKey("clients.id"), nullable=False)
     contract_id = Column("contract_id", Integer, ForeignKey("contracts.id"), nullable=True)
     domain_id = Column("domain_id", Integer, ForeignKey("domains.id"), nullable=True)
-
-    # Инженеры и создатели
     assigned_engineer_id = Column("assigned_engineer_id", BigInteger, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
 
     description = Column(Text, nullable=True)

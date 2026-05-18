@@ -28,6 +28,5 @@ class Client(Base):
         DateTime, nullable=False, server_default=func.now(), onupdate=func.now()
     )
 
-    # ВАЖНО: Добавлены все нужные связи
     user = relationship("User", back_populates="clients")
     contracts = relationship("Contract", back_populates="client")
