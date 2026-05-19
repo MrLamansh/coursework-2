@@ -40,7 +40,7 @@ def get_requests(
     if current_user.role == "engineer":
         query = query.filter(Request.assigned_engineer_id == current_user.id)
     elif current_user.role == "client":
-        # Клиенты используют отдельный эндпоинт /requests/my
+
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Недостаточно прав для просмотра заявок",
@@ -106,21 +106,12 @@ def create_request(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Создание заявки.
-
-    - Менеджер может создавать заявку для любого клиента как раньше.
-    - Клиент может создавать заявку только для себя: client_id подтянется из связанного профиля,
-      assigned_engineer_id и execution_status_id игнорируются, execution_status -> 'Новая',
-      contract_id будет подставлен из домена (если указан) или NULL.
-    """
     now = datetime.now(UTC)
 
-    # Проверяем тип заявки
     rt = db.query(RequestType).filter(RequestType.id == request_in.request_type_id).first()
     if not rt:
         raise HTTPException(status_code=404, detail="Тип заявки не найден")
 
-    # Если пользователь клиент — ограничиваем поля
     if current_user.role == "client":
         client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client:
@@ -134,7 +125,6 @@ def create_request(
             if contract.client_id != client.id:
                 raise HTTPException(status_code=403, detail="Договор не принадлежит клиенту")
 
-        # Валидация домена — клиент может выбирать только свои домены
         domain = None
         if request_in.domain_id is not None:
             domain = db.query(Domain).filter(Domain.id == request_in.domain_id, Domain.is_deleted.is_(False)).first()
@@ -145,7 +135,6 @@ def create_request(
             if contract and domain.contract_id != contract.id:
                 raise HTTPException(status_code=400, detail="Домен не относится к выбранному договору")
 
-        # execution_status = 'Новая'
         rs = db.query(RequestStatus).filter(RequestStatus.name == "Новая").first()
         execution_status_id = rs.id if rs else 1
 
@@ -172,15 +161,13 @@ def create_request(
             db.rollback()
             raise HTTPException(status_code=400, detail="Ошибка при создании заявки")
 
-    # Для менеджера сохраняем прежнюю логику, но если передан contract_id и
-    # client_id не заполнен — подтягиваем client_id из договора.
     client = None
     contract = None
     if request_in.contract_id is not None:
         contract = db.query(Contract).filter(Contract.id == request_in.contract_id, Contract.is_deleted.is_(False)).first()
         if not contract:
             raise HTTPException(status_code=404, detail="Договор не найден")
-        # попытка вывода client из договора, если клиент не был передан явно
+
         if request_in.client_id is None:
             client = db.query(Client).filter(Client.id == contract.client_id, Client.is_deleted.is_(False)).first()
             if not client:

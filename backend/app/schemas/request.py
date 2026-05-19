@@ -3,7 +3,6 @@ from pydantic import BaseModel
 
 
 class RequestBase(BaseModel):
-    # Для клиента некоторые поля не обязательны и будут заполняться на сервере
     request_type_id: int
     execution_status_id: int | None = None
     client_id: int | None = None

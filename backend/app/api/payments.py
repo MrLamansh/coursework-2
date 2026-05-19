@@ -57,7 +57,6 @@ def get_payments(
 ):
     query = db.query(Payment).filter(Payment.is_deleted.is_(False))
 
-    # Если клиент, показать только платежи своих договоров
     if current_user.role == "client":
         client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client:
@@ -86,7 +85,6 @@ def get_payment(
     if not payment:
         raise HTTPException(status_code=404, detail="Платёж не найден")
 
-    # Если клиент, проверить что это его платёж
     if current_user.role == "client":
         client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         contract = db.query(Contract).filter(Contract.id == payment.contract_id).first()

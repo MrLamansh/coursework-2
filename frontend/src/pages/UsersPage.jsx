@@ -18,7 +18,6 @@ function UsersPage() {
   const [editingUser, setEditingUser] = useState(null);
 
   useEffect(() => {
-    // Только менеджер может видеть список пользователей
     if (currentUser?.role !== "manager") {
       navigate("/");
       return;

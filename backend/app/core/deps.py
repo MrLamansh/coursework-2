@@ -51,7 +51,6 @@ def require_role(*allowed_roles: str):
     return dependency
 
 
-# Готовые хелперы для роутеров — используй их как Depends()
 def get_current_manager(user: User = Depends(require_role("manager"))) -> User:
     return user
 
@@ -68,9 +67,6 @@ def get_current_client(
     current_user: User = Depends(require_role("client")),
     db: Session = Depends(get_db),
 ) -> Client:
-    """Возвращает объект Client для текущего пользователя (role == 'client').
-    Поднимает 404 если связанный клиент не найден.
-    """
     client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
     if client is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client profile not found for user")

@@ -74,7 +74,6 @@ def list_domains(
         .filter(Domain.is_deleted.is_(False))
     )
 
-    # Если клиент, показать только домены своего клиента
     if current_user.role == "client":
         client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client:
@@ -114,7 +113,6 @@ def get_expiring_domains(
         )
     )
 
-    # Если клиент, показать только домены своего клиента
     if current_user.role == "client":
         client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client:
@@ -151,7 +149,6 @@ def get_domain(
             detail="Domain not found",
         )
 
-    # Если клиент, проверить что это его домен
     if current_user.role == "client":
         client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client or domain.contract.client_id != client.id:
@@ -224,7 +221,6 @@ def update_domain(
             detail="Domain not found",
         )
 
-    # Если инженер, разрешить только регистрацию и регистратора
     if current_user.role == "engineer":
         update_data = domain_in.model_dump(exclude_unset=True)
         allowed_fields = {"registration_date", "registrar_id"}
@@ -242,11 +238,9 @@ def update_domain(
     domain.updated_at = datetime.now()
 
     try:
-        # Синхронизируем статус домена на основе expiration_date (если обновляли дату)
         try:
             _sync_domain_status(cast(Any, domain), db)
         except Exception:
-            # Не критично — если синхронизация не удалась, всё равно пробуем сохранить остальные изменения
             pass
 
         db.add(domain)
@@ -302,7 +296,6 @@ def whois_check(
     if not domain:
         raise HTTPException(status_code=404, detail="Domain not found")
 
-    # Если клиент, проверить что это его домен
     if current_user.role == "client":
         client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client or domain.contract.client_id != client.id:
@@ -328,7 +321,7 @@ def whois_check(
 
     note = f"WHOIS проверка. Дата у регистратора: {whois_exp}. В БД: {db_exp}."
     if mismatch:
-        note += " ⚠️ РАСХОЖДЕНИЕ ДАННЫХ!"
+        note += "РАСХОЖДЕНИЕ ДАННЫХ!"
 
     event = DomainEvent(
         event_type_id=1,
@@ -412,7 +405,6 @@ def notify_expiring_domains(
     dependencies=[Depends(require_role("manager", "engineer"))],
 )
 def trigger_check(db: Session = Depends(get_db)):
-    """Ручной запуск ночной проверки доменов (для тестирования)."""
     run_daily_check(db)
     return {"status": "ok", "message": "Проверка выполнена, смотри логи и таблицу requests"}
 
@@ -423,7 +415,6 @@ def trigger_check(db: Session = Depends(get_db)):
     dependencies=[Depends(require_role("manager", "engineer"))],
 )
 def trigger_sync_statuses(db: Session = Depends(get_db)):
-    """Ручная синхронизация статусов доменов по expiration_date без создания заявок."""
     updated_count = sync_all_domain_statuses(db)
     return {
         "status": "ok",

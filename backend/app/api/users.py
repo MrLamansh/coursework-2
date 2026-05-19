@@ -15,7 +15,7 @@ def get_users(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
-    _: User = Depends(require_role("manager")),  # только менеджер видит всех юзеров
+    _: User = Depends(require_role("manager")),
 ):
     return db.query(User).filter(User.is_deleted.is_(False)).order_by(User.id).offset(skip).limit(limit).all()
 
@@ -36,7 +36,7 @@ def get_user_by_id(
 def create_user(
     user_in: UserCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_role("manager")),  # только менеджер создаёт пользователей
+    _: User = Depends(require_role("manager")),
 ):
     if db.query(User).filter(User.username == user_in.username, User.is_deleted.is_(False)).first():
         raise HTTPException(status_code=400, detail="Пользователь с таким именем уже существует")

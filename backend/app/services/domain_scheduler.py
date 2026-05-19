@@ -17,8 +17,6 @@ def run_daily_check(db: Session):
     logger.info("Запуск проверки доменов...")
     now = datetime.now()
 
-    # Сначала приводим статусы всех доменов к актуальному виду,
-    # чтобы в БД не оставались просроченные домены со статусом "Активен".
     sync_all_domain_statuses(db, now)
 
     domains = (
@@ -32,7 +30,6 @@ def run_daily_check(db: Session):
 
     for domain in domains:
         try:
-            # Синхронизируем статус домена по дате истечения
             try:
                 _sync_domain_status(domain, db, now)
             except Exception as e:
@@ -72,7 +69,6 @@ def run_daily_check(db: Session):
                 f"осталось {days_left} дней (истекает {domain.expiration_date.date()})."
             )
 
-            # Генерируем уникальный номер заявки
             request_number = f"AUTO-{now.strftime('%Y%m%d')}-{uuid.uuid4().hex[:8].upper()}"
 
             new_request = Request(
@@ -164,7 +160,6 @@ def _sync_domain_status(domain, db: Session, now: datetime | None = None):
         old = domain.current_status_id
         domain.current_status_id = status_obj.id
         db.add(domain)
-        # Добавляем событие об изменении статуса
         try:
             ev = DomainEvent(
                 event_type_id=3,

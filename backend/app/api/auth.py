@@ -20,8 +20,8 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/login", response_model=Token)
 def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db),
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        db: Session = Depends(get_db),
 ):
     user = db.query(User).filter(User.username == form_data.username, User.is_deleted.is_(False)).first()
 

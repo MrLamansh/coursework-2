@@ -2,14 +2,11 @@ function StatusBadge({ status }) {
   let backgroundColor = "#d1d5db";
   let textColor = "#1f2937";
 
-  // Маппинг статусов на цвета
   const statusColors = {
-    // Роли
     "manager": { bg: "#2563eb", text: "#ffffff" },
     "engineer": { bg: "#7c3aed", text: "#ffffff" },
     "client": { bg: "#10b981", text: "#ffffff" },
 
-    // Статусы доменов
     "Активен": { bg: "#10b981", text: "#ffffff" },
     "Просрочен": { bg: "#dc2626", text: "#ffffff" },
     "На продление": { bg: "#f59e0b", text: "#ffffff" },
@@ -17,20 +14,17 @@ function StatusBadge({ status }) {
     "Удалён": { bg: "#6b7280", text: "#ffffff" },
     "Истекает сегодня": { bg: "#dc2626", text: "#ffffff" },
 
-    // Статусы договоров
     "На согласовании": { bg: "#f59e0b", text: "#ffffff" },
     "Завершён": { bg: "#6b7280", text: "#ffffff" },
     "Приостановлен": { bg: "#ef4444", text: "#ffffff" },
     "Отменён": { bg: "#6b7280", text: "#ffffff" },
 
-    // Статусы платежей
     "Ожидает оплаты": { bg: "#f59e0b", text: "#ffffff" },
     "Оплачен": { bg: "#10b981", text: "#ffffff" },
     "Отклонен": { bg: "#dc2626", text: "#ffffff" },
     "Возвращен": { bg: "#6b7280", text: "#ffffff" },
     "Частично оплачен": { bg: "#f59e0b", text: "#ffffff" },
 
-    // Статусы заявок
     "Открыта": { bg: "#3b82f6", text: "#ffffff" },
     "В работе": { bg: "#f59e0b", text: "#ffffff" },
     "На утверждении": { bg: "#8b5cf6", text: "#ffffff" },

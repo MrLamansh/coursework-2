@@ -31,7 +31,6 @@ def get_contracts(
 ):
     query = db.query(Contract).filter(Contract.is_deleted.is_(False))
 
-    # Если клиент, показать только свои договоры
     if current_user.role == "client":
         client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client:
@@ -65,7 +64,6 @@ def get_contract(
     if not contract:
         raise HTTPException(status_code=404, detail="Контракт не найден")
 
-    # Если клиент, проверить что это его договор
     if current_user.role == "client":
         client = db.query(Client).filter(Client.user_id == current_user.id, Client.is_deleted.is_(False)).first()
         if not client or contract.client_id != client.id:

@@ -12,9 +12,6 @@ from app.schemas.directories import DirectoryRead, RegistrarRead
 
 router = APIRouter(prefix="/directories", tags=["Directories"])
 
-
-# Доступ к справочникам: менеджеры и инженеры, а также клиенты для чтения
-# (фронтенд запрашивает справочники для отображения меток на страницах клиентов)
 common_dep = [Depends(require_role("manager", "engineer", "client"))]
 
 

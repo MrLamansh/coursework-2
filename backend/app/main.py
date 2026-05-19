@@ -25,7 +25,6 @@ from app.services.domain_scheduler import run_daily_check, sync_all_domain_statu
 
 
 def scheduled_domain_check():
-    """Обёртка для APScheduler — создаёт свою сессию БД и закрывает после работы."""
     db = SessionLocal()
     try:
         run_daily_check(db)
@@ -35,7 +34,6 @@ def scheduled_domain_check():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # При старте выравниваем уже существующие статусы доменов по expiration_date.
     startup_db = SessionLocal()
     try:
         sync_all_domain_statuses(startup_db)
@@ -44,7 +42,6 @@ async def lifespan(app: FastAPI):
     finally:
         startup_db.close()
 
-    # Запускаем планировщик при старте приложения
     scheduler = BackgroundScheduler()
     scheduler.add_job(
         scheduled_domain_check,
@@ -57,9 +54,8 @@ async def lifespan(app: FastAPI):
     scheduler.start()
     logger.info("Планировщик запущен. Проверка доменов каждый день в 03:00")
 
-    yield  # Приложение работает
+    yield
 
-    # Останавливаем при выключении
     scheduler.shutdown()
     logger.info("Планировщик остановлен")
 

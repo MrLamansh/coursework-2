@@ -9,6 +9,8 @@ from app.db.session import get_db
 from app.models.client import Client
 from app.models.contract import Contract
 from app.models.domain import Domain
+from app.models.payment import Payment
+from app.models.request import Request
 from app.models.user import User
 from app.schemas.client import ClientCreate, ClientRead, ClientUpdate
 
@@ -206,7 +208,6 @@ def delete_client(
     now = datetime.now()
     client.is_deleted = True
 
-    # Собираем все договоры клиента для каскада на домены
     all_contract_ids = [
         contract_id
         for (contract_id,) in db.query(Contract.id)
@@ -214,7 +215,6 @@ def delete_client(
         .all()
     ]
 
-    # Каскадно помечаем активные договоры клиента как удалённые
     active_contract_ids = [
         contract_id
         for (contract_id,) in db.query(Contract.id)
@@ -231,7 +231,6 @@ def delete_client(
         )
 
     if all_contract_ids:
-        # Каскадно помечаем домены договоров клиента как удалённые
         db.query(Domain).filter(
             Domain.contract_id.in_(all_contract_ids),
             Domain.is_deleted.is_(False),
@@ -242,6 +241,28 @@ def delete_client(
             },
             synchronize_session=False,
         )
+
+        db.query(Payment).filter(
+            Payment.contract_id.in_(all_contract_ids),
+            Payment.is_deleted.is_(False),
+        ).update(
+            {
+                Payment.is_deleted: True,
+                Payment.updated_at: now,
+            },
+            synchronize_session=False,
+        )
+
+    db.query(Request).filter(
+        Request.client_id == client.id,
+        Request.is_deleted.is_(False),
+    ).update(
+        {
+            Request.is_deleted: True,
+            Request.updated_at: now,
+        },
+        synchronize_session=False,
+    )
 
     db.add(client)
     db.commit()

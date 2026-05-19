@@ -16,7 +16,6 @@ def _parse_expiration(exp):
             if e:
                 exp = e
                 break
-    # если строка, пытаемся распарсить
     if isinstance(exp, str):
         try:
             dt = date_parser.parse(exp)
@@ -24,7 +23,6 @@ def _parse_expiration(exp):
         except Exception:
             return None
     if isinstance(exp, datetime):
-        # приводим к UTC и убираем tzinfo (DB у вас хранит naive dt)
         if exp.tzinfo is not None:
             exp = exp.astimezone(timezone.utc).replace(tzinfo=None)
         return exp
@@ -35,7 +33,6 @@ def check_whois(domain_name: str, timeout: float = 10.0, retries: int = 2):
     last_error = None
     for attempt in range(1, retries + 1):
         try:
-            # Не менять глобальный таймаут: используем локальный сокет timeout
             import socket as _socket
             prev = _socket.getdefaulttimeout()
             try:

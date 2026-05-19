@@ -4,26 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a65856c1-953b-465d-a0b0-fa9f03ed028c" name="Changes" comment="Почти все готово">
+    <list default="true" id="a65856c1-953b-465d-a0b0-fa9f03ed028c" name="Changes" comment="Практически итоговая версия">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/api/reports.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/reports.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/clients.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/clients.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/contracts.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/contracts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/directories.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/directories.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/domains.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/domains.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/payments.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/payments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/api/requests.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/requests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/contract.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/contract.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/domain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/domain.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/event.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/event.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/payment.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/payment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/api/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/users.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/core/deps.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/core/deps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/core/email_sender.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/core/email_sender.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/models/request.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/request.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/domain.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/domain.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/payment.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/payment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/directories.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/directories.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/schemas/request.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/request.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/services/domain_checker.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/domain_checker.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/services/domain_scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/domain_scheduler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/hash_passwords.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/ProtectedRoute.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ProtectedRoute.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/forms/RequestForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/forms/RequestForm.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/RequestsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/RequestsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/StatusBadge.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/StatusBadge.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/UsersPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/UsersPage.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +33,7 @@
   <component name="CopilotChats">
     <option name="panelChat">
       <chat>
-        <option name="activeSessionId" value="039fad95-e9b0-410b-bec5-f3a1525413fb" />
+        <option name="activeSessionId" value="4c2a915f-bbb3-42f3-b92d-8a35f57fbf3a" />
         <option name="sessions">
           <session>
             <option name="chatType" value="PANEL" />
@@ -84,6 +84,14 @@
             <option name="modelValue" value="auto" />
             <option name="targetType" value="LOCAL" />
           </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="4c2a915f-bbb3-42f3-b92d-8a35f57fbf3a" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
         </option>
         <option name="type" value="PANEL" />
       </chat>
@@ -112,8 +120,12 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
+  &quot;history&quot;: [
+    {
+      &quot;assignee&quot;: &quot;MrLamansh&quot;
+    }
+  ],
   &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
     &quot;assignee&quot;: &quot;MrLamansh&quot;
   }
 }</component>
@@ -268,7 +280,23 @@
       <option name="project" value="LOCAL" />
       <updated>1778499125698</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Практически итоговая версия">
+      <option name="closed" value="true" />
+      <created>1779126500826</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1779126500826</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Практически итоговая версия">
+      <option name="closed" value="true" />
+      <created>1779126625720</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1779126625720</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -279,7 +307,8 @@
     <MESSAGE value="Бэк добилил, фронт не трогал" />
     <MESSAGE value="Почти рабочий полный фронтенд, бэкенд немного доделал" />
     <MESSAGE value="Почти все готово" />
-    <option name="LAST_COMMIT_MESSAGE" value="Почти все готово" />
+    <MESSAGE value="Практически итоговая версия" />
+    <option name="LAST_COMMIT_MESSAGE" value="Практически итоговая версия" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
